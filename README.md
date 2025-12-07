@@ -5,4 +5,4 @@ Este repositorio contiene una colección de documentos y recursos relacionados c
 
 ### Riesgo de Mercado con Python: 
 
-Una guía completa sobre el cálculo de métricas de riesgo de mercado, incluyendo volatilidad, Value at Risk (VaR) y Tracking Error, con ejemplos prácticos en Python. [Ver documento](Riesgo%20de%20Mercado/doc.md)
+Una guía completa sobre el cálculo de métricas de riesgo de mercado, incluyendo volatilidad, Value at Risk (VaR) y Tracking Error, con ejemplos prácticos en Python. [Ver documento](Riesgo%20de%20Mercado/README.md)
