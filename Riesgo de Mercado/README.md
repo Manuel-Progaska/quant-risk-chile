@@ -76,6 +76,56 @@ ewma_vol_annualized = ewma_vol * np.sqrt(252)
 print(f'Volatilidad anualizada con EWMA: {ewma_vol_annualized[-1]:.2%}')
 ```
 
+En el caso de una cartera de varios activos, se puede calcular la matriz de covarianza utilizando EWMA de la siguiente manera:
+
+```python
+import numpy as np
+import pandas as pd   
+# Función para calcular la matriz de covarianza con EWMA
+def ewma_covariance(returns:pd.DataFrame, lambda_:float=0.94) -> pd.DataFrame:
+    ewma_cov = returns.ewm(alpha=1 - lambda_).cov()
+    return ewma_cov   
+# Calcular la matriz de covarianza con EWMA
+ewma_cov_matrix = ewma_covariance(returns_df)
+# Calcular la volatilidad de la cartera con la matriz EWMA
+portfolio_ewma_volatility = np.sqrt(np.dot(weights.T, np.dot(ewma_cov_matrix.xs(level=0, axis=0).values, weights)))
+portfolio_ewma_volatility_annualized = portfolio_ewma_volatility * np.sqrt(252)
+print(f'Volatilidad anual de la cartera con EWMA: {portfolio_ewma_volatility_annualized:.2%}')
+```
+
+## Value at Risk (VaR)
+El Value at Risk (VaR) es una medida estadística que estima la pérdida máxima potencial de una cartera de inversión durante un período específico, con un nivel de confianza determinado. Por ejemplo, un VaR del 5% a un día indica que hay un 5% de probabilidad de que la cartera pierda más de una cantidad específica en un solo día.  
+
+### Cálculo del VaR Paramétrico
+El VaR paramétrico asume que los rendimientos de los activos siguen una distribución normal. A continuación, se muestra un ejemplo de cómo calcular el VaR paramétrico para una cartera utilizando Python:
+
+```python
+import numpy as np
+import pandas as pd
+from scipy.stats import norm
+
+# Simular rendimientos de un activo financiero
+np.random.seed(42)
+days = 252 * 3  # 3 años de datos diarios
+returns = np.random.normal(0, 0.01, days)  # Rendimientos
+returns_series = pd.Series(returns)
+
+# Parámetros del VaR
+confidence_level = 0.95
+mean_return = returns_series.mean()
+std_dev = returns_series.std()
+
+# Calcular el VaR paramétrico
+z_score = norm.ppf(1 - confidence_level)
+var_parametric = -(mean_return + z_score * std_dev)
+print(f'VaR paramétrico al {confidence_level*100}%: {var_parametric:.2%}')
+```
+
+
+
+
+
+
 
 
 
