@@ -7,7 +7,7 @@ El riesgo de mercado se refiere a la posibilidad de que el valor de una inversi�
 Para cuantificar el riesgo de mercado, se utilizan diversas métricas. A continuación, se describen algunas de las más comunes:
 ### Volatilidad
 La volatilidad mide la variabilidad de los rendimientos de un activo financiero. Se calcula comúnmente como la desviación estándar de los rendimientos históricos. Una mayor volatilidad indica un mayor riesgo, ya que los precios del activo pueden fluctuar significativamente en un corto período de tiempo.    
-### Value at Risk (VaR)
+### Value at Risk
 El Value at Risk (VaR) es una medida estadística que estima la pérdida máxima potencial de una cartera de inversión durante un período específico, con un nivel de confianza determinado. Por ejemplo, un VaR del 5% a un día indica que hay un 5% de probabilidad de que la cartera pierda más de una cantidad específica en un solo día.    
 ### Tracking Error
 El Tracking Error mide la desviación estándar de las diferencias entre los rendimientos de una cartera y su índice de referencia. Esta métrica es útil para evaluar el desempeño de una cartera en comparación con un benchmark, y un menor Tracking Error indica una mayor similitud en el comportamiento entre la cartera y el índice de referencia.  
