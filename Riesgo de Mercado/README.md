@@ -285,6 +285,12 @@ La descomposición de Cholesky consiste en descomponer esta matriz en el product
 
 $$
 \begin{bmatrix}
+1 & 0.8 & 0.1 \\
+0.8 & 1 & 0.2 \\
+0.1 & 0.2 & 1
+\end{bmatrix}
+=
+\begin{bmatrix}
 1 & 0 & 0 \\
 0.8 & 0.6 & 0 \\
 0.1 & 0.18 & 0.98
@@ -295,17 +301,12 @@ $$
 0 & 0.6 & 0.18 \\
 0 & 0 & 0.98
 \end{bmatrix}
-=
-\begin{bmatrix}
-1 & 0.8 & 0.1 \\
-0.8 & 1 & 0.2 \\
-0.1 & 0.2 & 1
-\end{bmatrix}
+
 $$
 
 Lo anterior se resume como:
 
-$$L \cdot L^T = \Sigma $$
+$$\Sigma  = L \cdot L^T $$
 
 Donde $(L)$ es la matriz triangular inferior y $(\Sigma)$ es la matriz de correlación original.
 
