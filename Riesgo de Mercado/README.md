@@ -294,6 +294,12 @@ $$
 0.8 & 0.6 & 0 \\
 0.1 & 0.18 & 0.98
 \end{bmatrix}
+\cdot
+\begin{bmatrix}
+1 & 0.8 & 0.1 \\
+0 & 0.6 & 0.18 \\
+0 & 0 & 0.98
+\end{bmatrix}
 $$
 
 Lo anterior se resume como:
