@@ -309,7 +309,7 @@ $$L \cdot L^T = \Sigma $$
 
 Donde $(L)$ es la matriz triangular inferior y $(\Sigma)$ es la matriz de correlación original.
 
-Una vez obtenida la matriz $(L)$, se genera un vector de variables aleatorias normales estándar independientes $(\mu_1, \mu_2, ...,\mu_n)$. Donde el producto punto de la matriz $(L)$ y el vector de variables aleatorias independientes da como resultado un nuevo vector de variables aleatorias correlacionadas $(Y_1, Y_2, ... , Y_n)$.
+Una vez obtenida la matriz $(L)$, se genera un vector de variables aleatorias normales estándar independientes $(z_1, z_2, ...,z_n)$. Donde el producto punto de la matriz $(L)$ y el vector de variables aleatorias independientes da como resultado un nuevo vector de variables aleatorias correlacionadas 
 
 
 $$
@@ -321,9 +321,9 @@ Z =
 \end{bmatrix}
 \cdot
 \begin{bmatrix}
-\mu_1 \\
-\mu_2 \\
-\mu_3
+z_1 \\
+z_2 \\
+z_3
 \end{bmatrix}
 $$
 
