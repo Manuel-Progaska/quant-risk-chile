@@ -93,10 +93,10 @@ portfolio_ewma_volatility_annualized = portfolio_ewma_volatility * np.sqrt(252)
 print(f'Volatilidad anual de la cartera con EWMA: {portfolio_ewma_volatility_annualized:.2%}')
 ```
 
-## Value at Risk (VaR)
+### Cálculo VaR
 El Value at Risk (VaR) es una medida estadística que estima la pérdida máxima potencial de una cartera de inversión durante un período específico, con un nivel de confianza determinado. Por ejemplo, un VaR del 5% a un día indica que hay un 5% de probabilidad de que la cartera pierda más de una cantidad específica en un solo día.  
 
-### Cálculo del VaR Paramétrico
+####  Método Paramétrico
 El VaR paramétrico asume que los rendimientos de los activos siguen una distribución normal. A continuación, se muestra un ejemplo de cómo calcular el VaR paramétrico para una cartera utilizando Python:
 
 ```python
@@ -120,6 +120,280 @@ z_score = norm.ppf(1 - confidence_level)
 var_parametric = -(mean_return + z_score * std_dev)
 print(f'VaR paramétrico al {confidence_level*100}%: {var_parametric:.2%}')
 ```
+Para el caso de una cartera de varios activos, se puede calcular el VaR paramétrico utilizando la volatilidad de la cartera:
+
+```python
+import numpy as np
+import pandas as pd
+
+# Simular rendimientos de 4 activos
+num_assets = 4
+returns_matrix = np.random.normal(0, 0.01, (days, num_assets))
+returns_df = pd.DataFrame(returns_matrix, columns=[f'Asset_{i+1}' for i in range(num_assets)])  
+
+# Pesos de la cartera
+weights = np.array([0.25, 0.25, 0.25, 0.25])
+
+# Calcular la matriz de covarianza
+cov_matrix = returns_df.cov()
+
+# Calcular la volatilidad de la cartera
+portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix.values, weights)))
+portfolio_volatility_annualized = portfolio_volatility * np.sqrt(252)   
+
+# Parámetros del VaR
+confidence_level = 0.95
+mean_return = returns_df.dot(weights).mean()
+std_dev = portfolio_volatility_annualized
+# Calcular el VaR paramétrico de la cartera
+z_score = norm.ppf(1 - confidence_level)
+var_parametric_portfolio = -(mean_return + z_score * std_dev)
+print(f'VaR paramétrico de la cartera al {confidence_level*100}%: {var_parametric_portfolio:.2%}')
+```
+
+En ambos ejercicios anteriores, se puede ajustar el cálculo ultilizando EWMA, para esto, se debe utilizar la volatilidad calculada con EWMA en lugar de la volatilidad estándar.
+
+#### Método Histórico
+El VaR histórico se basa en datos históricos de rendimientos para estimar la pérdida máxima potencial. A continuación, se muestra un ejemplo de cómo calcular el VaR histórico para un activo financiero utilizando Python:
+```python
+import numpy as np
+import pandas as pd
+# Simular rendimientos de un activo financiero
+np.random.seed(42)
+days = 252 * 3  # 3 años de datos diarios
+returns = np.random.normal(0, 0.01, days)  # Rendimientos
+returns_series = pd.Series(returns)
+# Parámetros del VaR
+confidence_level = 0.95
+# Calcular el VaR histórico
+var_historical = -returns_series.quantile(1 - confidence_level)
+print(f'VaR histórico al {confidence_level*100}%: {var_historical:.2%}')
+```
+Para el caso de una cartera de varios activos, se puede calcular el VaR histórico utilizando los rendimientos ponderados de la cartera:
+```python
+import numpy as np
+import pandas as pd
+# Simular rendimientos de 4 activos
+num_assets = 4
+returns_matrix = np.random.normal(0, 0.01, (days, num_assets))
+returns_df = pd.DataFrame(returns_matrix, columns=[f'Asset_{i+1}' for i in range(num_assets)])  
+# Pesos de la cartera
+weights = np.array([0.25, 0.25, 0.25, 0.25])
+# Calcular los rendimientos de la cartera
+portfolio_returns = returns_df.dot(weights)
+# Parámetros del VaR
+confidence_level = 0.95
+# Calcular el VaR histórico de la cartera
+var_historical_portfolio = -portfolio_returns.quantile(1 - confidence_level)
+print(f'VaR histórico de la cartera al {confidence_level*100}%: {var_historical_portfolio:.2%}')
+```
+
+#### Método Simulación de Monte Carlo
+El VaR mediante simulación de Monte Carlo implica generar múltiples escenarios de rendimientos futuros. Para lo anterior, simulamos muchos futuros posibles usando un modelo matemático de cómo se mueven los precios: el Browniano Geométrico (GBM).
+
+##### **Movimiento Browniano Geométrico**
+El GBM es un modelo simple y popular en finanzas. Supone tres cosas clave:
+
+1. Los retornos logarítmicos son normales
+Esto significa que el retorno de un día sigue algo parecido a una campana (normal), lo cual es una aproximación simplificada, pero útil.
+
+2. La volatilidad es constante en el tiempo
+El riesgo de cada activo no cambia durante el horizonte simulado.
+
+3. Los precios nunca caen bajo cero
+Porque el modelo trabaja con exponenciales (lo cual es razonable).
+
+La fórmula del GBM es:
+
+$$ S_1 = S_0 \cdot e^{(\mu - \frac{1}{2}\sigma^2)\,\Delta t + \sigma \sqrt{\Delta t}\, Z} $$
+
+Donde:
+- $( S_1 )$ es el precio simulado al final del período.
+- $( S_0 )$ es el precio inicial.
+- $(\mu )$ es el retorno esperado (drift).
+- $(\sigma )$ es la volatilidad del activo.
+- $(\Delta t)$ es el tamaño del paso de tiempo (por ejemplo, 1 día = 1/252 años).
+- $(Z)$ es una variable aleatoria normal estándar (media 0, desviación estándar 1).
+
+Intuitivamente, el término $(\mu - \frac{1}{2}\sigma^2)\,\Delta t$ representa el crecimiento esperado ajustado por la volatilidad, mientras que el término $\sigma \sqrt{\Delta t}\, Z$ introduce la aleatoriedad en los precios.
+
+Para simular múltiples trayectorias de precios futuros de un solo activo financiero, hay que seguir los siguientes pasos:
+
+1. Calcular los parámetros necesarios: retorno esperado $(\mu)$ y volatilidad $(\sigma)$ a partir de los datos históricos.
+
+2. Generar un número Z que provenga de una distribución normal estándar.
+
+3. Aplicar la fórmula del GBM para obtener el precio simulado al final del período.
+
+4. Repetir los pasos 2 y 3 para generar múltiples simulaciones.
+
+A continuación, se muestra un ejemplo de cómo implementar la simulación de Monte Carlo para calcular el VaR de un activo financiero utilizando Python:
+```python
+import numpy as np
+import pandas as pd
+
+# Simular rendimientos de un activo financiero
+np.random.seed(42)
+days = 252 * 3  # 3 años de datos diarios
+returns = np.random.normal(0, 0.01, days)  # Rendimientos
+returns_series = pd.Series(returns) 
+
+# Parámetros del activo
+S0 = 100  # Precio inicial
+# Retorno anualizado
+mu = returns_series.mean() * 252  
+# Volatilidad anualizada   
+sigma = returns_series.std() * np.sqrt(252)  
+
+# Simulación de Monte Carlo
+num_simulations = 10000
+time_horizon = 1/252  # 1 día
+simulated_prices = []   
+for _ in range(num_simulations):
+    Z = np.random.normal()
+    S1 = S0 * np.exp((mu - 0.5 * sigma**2) * time_horizon + sigma * np.sqrt(time_horizon) * Z)
+    simulated_prices.append(S1)
+simulated_prices = np.array(simulated_prices)
+
+# Calcular los rendimientos simulados
+simulated_returns = (simulated_prices - S0) / S0
+
+# Parámetros del VaR
+confidence_level = 0.95
+
+# Calcular el VaR mediante simulación de Monte Carlo
+var_monte_carlo = -np.percentile(simulated_returns, (1 - confidence_level) * 100)
+print(f'VaR por Simulación de Monte Carlo al {confidence_level*100}%: {var_monte_carlo:.2%}')
+```
+
+Al considerar una cartera de varios activos, hay que tener presente que los activos no se mueven de forma independiente, algunos suben juntos, otros se mueven en sentido contrario.
+
+Para que las simulaciones sean realistas necesitamos que los shocks aleatorios $(\mu)$ de los activos estén correlacionados. Para lo anterior se utiliza la descomposición de Cholesky de la matriz de correlación de los activos, a partir de esta, se obtiene la matriz triangular inferior, la cual es la que se utliza para correlacionar los shocks aleatorios generados.
+
+##### **Descomposición de Cholesky**
+Imaginemos un portafolio de tres activos, del cual se puede calcular una matriz de correlación como la siguiente:
+
+$$
+\begin{bmatrix}
+1 & 0.8 & 0.1 \\
+0.8 & 1 & 0.2 \\
+0.1 & 0.2 & 1
+\end{bmatrix}
+$$   
+
+La descomposición de Cholesky consiste en descomponer esta matriz en el producto de una matriz triangular inferior y su transpuesta. 
+
+$$
+\begin{bmatrix}
+1 & 0 & 0 \\
+0.8 & 0.6 & 0 \\
+0.1 & 0.18 & 0.98
+\end{bmatrix}
+\cdot
+\begin{bmatrix}
+1 & 0.8 & 0.1 \\
+0 & 0.6 & 0.18 \\
+0 & 0 & 0.98
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 & 0.8 & 0.1 \\
+0.8 & 1 & 0.2 \\
+0.1 & 0.2 & 1
+\end{bmatrix}
+$$
+
+Lo anterior se resume como:
+
+$$L \cdot L^T = \Sigma $$
+
+Donde $(L)$ es la matriz triangular inferior y $(\Sigma)$ es la matriz de correlación original.
+
+Una vez obtenida la matriz $(L)$, se genera un vector de variables aleatorias normales estándar independientes $(\mu_1, \mu_2, ...,\mu_n)$. Donde el producto punto de la matriz $(L)$ y el vector de variables aleatorias independientes da como resultado un nuevo vector de variables aleatorias correlacionadas $(Y_1, Y_2, ... , Y_n)$.
+
+
+$$
+Z =
+\begin{bmatrix}
+1 & 0 & 0 \\
+0.8 & 0.6 & 0 \\
+0.1 & 0.18 & 0.98
+\end{bmatrix}
+\cdot
+\begin{bmatrix}
+\mu_1 \\
+\mu_2 \\
+\mu_3
+\end{bmatrix}
+$$
+
+Cada elemento del vector $(Z)$ representa un shock aleatorio correlacionado para cada activo en la cartera. Estos shocks se utilizan luego en la fórmula del Movimiento Browniano Geométrico para simular los precios futuros de cada activo, teniendo en cuenta la correlación entre ellos.
+
+Así, la formula del GBM para cada activo $(i)$ en la cartera se ajusta de la siguiente manera:  
+
+$$ S_{1,i} = S_{0,i} \cdot e^{(\mu_i - \frac{1}{2}\sigma_i^2)\,\Delta t + \sigma_i \sqrt{\Delta t}\, Z_i} $$
+
+Donde:
+- $( S_{1,i} )$ es el precio simulado del activo $(i)$ al final del período.
+- $( S_{0,i} )$ es el precio inicial del activo $(i)$.
+- $(\mu_i )$ es el retorno esperado del activo $(i)$.
+- $(\sigma_i )$ es la volatilidad del activo $(i)$.
+- $(Z_i)$ es el shock aleatorio correlacionado para el activo $(i)$.    
+
+A continuación, se muestra un ejemplo de cómo implementar la simulación de Monte Carlo con descomposición de Cholesky para calcular el VaR de una cartera de varios activos utilizando Python:
+```python
+import numpy as np
+import pandas as pd
+
+# Simular rendimientos de 4 activos
+num_assets = 4
+returns_matrix = np.random.normal(0, 0.01, (days, num_assets))
+returns_df = pd.DataFrame(returns_matrix, columns=[f'Asset_{i+1}' for i in range(num_assets)])
+
+# Pesos de la cartera
+weights = np.array([0.25, 0.25, 0.25, 0.25]) 
+
+# Parámetros de los activos
+S0 = np.array([100, 150, 200, 250])  
+mu = returns_df.mean() * 252  
+sigma = returns_df.std() * np.sqrt(252)
+
+# Matriz de correlación y descomposición de Cholesky
+correlation_matrix = returns_df.corr()
+L = np.linalg.cholesky(correlation_matrix)
+
+# Simulación de Monte Carlo con Cholesky
+num_simulations = 10000
+time_horizon = 1/252  # 1 día
+simulated_portfolio_returns = []   
+for _ in range(num_simulations):
+    Z_independent = np.random.normal(size=num_assets)
+    # Correlacionar los shocks
+    Z_correlated = L @ Z_independent  
+    S1 = S0 * np.exp((mu - 0.5 * sigma**2) * time_horizon + sigma * np.sqrt(time_horizon) * Z_correlated)   
+    portfolio_return = np.dot(weights, (S1 - S0) / S0)
+    simulated_portfolio_returns.append(portfolio_return)
+simulated_portfolio_returns = np.array(simulated_portfolio_returns)     
+
+# Parámetros del VaR
+confidence_level = 0.95 
+
+# Calcular el VaR mediante simulación de Monte Carlo para la cartera
+var_monte_carlo_portfolio = -np.percentile(simulated_portfolio_returns, (1 - confidence_level) * 100)
+print(f'VaR por Simulación de Monte Carlo de la cartera al {confidence_level*100}%: {var_monte_carlo_portfolio:.2%}')
+``` 
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
