@@ -83,17 +83,6 @@ Este repositorio contiene una **colección completa de documentos y recursos** r
 
 ---
 
-### 📋 **Dependencias Principales**
-```python
-numpy>=1.24.0
-pandas>=2.0.0
-scipy>=1.10.0
-matplotlib>=3.7.0
-jupyter>=1.0.0
-```
-
----
-
 ### 🔥 **Algoritmos Implementados**
 
 - 🔄 **EWMA**: Volatilidad adaptativa con decaimiento exponencial
