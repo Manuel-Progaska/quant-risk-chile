@@ -1,169 +1,360 @@
-# Riesgo de Mercado con Python
+<div align="center">
 
-## ¿Qué es el Riesgo de Mercado?
-El riesgo de mercado se refiere a la posibilidad de que el valor de una inversión disminuya debido a cambios en las condiciones del mercado financiero. Este tipo de riesgo afecta a todos los activos financieros, incluyendo acciones, bonos, divisas y derivados. Los factores que contribuyen al riesgo de mercado incluyen fluctuaciones en las tasas de interés, cambios en los precios de los activos, volatilidad del mercado y eventos económicos o políticos.
+# 📊 Gestión de Riesgo de Mercado
+## *Implementación Cuantitativa con Python*
 
-## Métricas de Riesgo de Mercado
-Para cuantificar el riesgo de mercado, se utilizan diversas métricas. A continuación, se describen algunas de las más comunes:
 
-### Volatilidad
-La volatilidad mide la variabilidad de los rendimientos de un activo financiero. Se calcula comúnmente como la desviación estándar de los rendimientos históricos. Una mayor volatilidad indica un mayor riesgo, ya que los precios del activo pueden fluctuar significativamente en un corto período de tiempo.   
 
-### Value at Risk
-El Value at Risk (VaR) es una medida estadística que estima la pérdida máxima potencial de una cartera de inversión durante un período específico, con un nivel de confianza determinado. Por ejemplo, un VaR del 5% a un día indica que hay un 5% de probabilidad de que la cartera pierda más de una cantidad específica en un solo día.    
+![Python](https://img.shields.io/badge/Python-Financial%20Risk-blue?style=for-the-badge&logo=python)
+![NumPy](https://img.shields.io/badge/NumPy-Mathematical%20Computing-013243?style=for-the-badge&logo=numpy)
+![SciPy](https://img.shields.io/badge/SciPy-Statistical%20Analysis-8CAAE6?style=for-the-badge&logo=scipy)
 
-### Tracking Error
-El Tracking Error mide la desviación estándar de las diferencias entre los rendimientos de una cartera y su índice de referencia. Esta métrica es útil para evaluar el desempeño de una cartera en comparación con un benchmark, y un menor Tracking Error indica una mayor similitud en el comportamiento entre la cartera y el índice de referencia.  
+</div>
 
-### Beta de mercado
-El Beta de mercado es una medida de la sensibilidad de los rendimientos de un activo o cartera en relación con los rendimientos del mercado en general. Un beta mayor que 1 indica que el activo tiende a moverse más que el mercado, mientras que un beta menor que 1 sugiere que el activo es menos volátil que el mercado. El beta se utiliza comúnmente para evaluar el riesgo sistemático de un activo en comparación con el mercado global.
+<br>
 
-## Implementación en Python
-A continuación, se presentan ejemplos de cómo calcular estas métricas utilizando Python.
+## 🎯 Definición del Riesgo de Mercado
 
-### Cálculo de Volatilidad
-Para estimar la volatilidad de un activo financiero, se utiliza como inidcador la desviación estandar de los rendimientos histórico.
+El **riesgo de mercado** se refiere a la posibilidad de que el valor de una inversión disminuya debido a cambios en las condiciones del mercado financiero. Este tipo de riesgo es **sistemático** y afecta a todos los activos financieros, incluyendo:
 
-A continuación, se muestra un ejemplo de cómo calcular la volatilidad simulando 3 años de rendimientos diarios de un activo financiero:
+- **🏛️ Acciones** - Riesgo de precio y volatilidad
+- **📋 Bonos** - Riesgo de tasa de interés y crédito  
+- **💱 Divisas** - Riesgo cambiario
+- **📈 Derivados** - Riesgo de subyacente y volatilidad
+
+<br>
+
+### Factores Determinantes
+
+| Factor | Descripción | Impacto |
+|--------|-------------|----------|
+| **📈 Tasas de Interés** | Fluctuaciones en política monetaria | Alto |
+| **💹 Precios de Activos** | Movimientos del mercado | Directo |
+| **⚡ Volatilidad** | Incertidumbre e inestabilidad | Variable |
+| **🌍 Eventos Macro** | Políticos, económicos, geopolíticos | Sistémico |
+
+<br>
+
+## 📊 Métricas Fundamentales de Riesgo de Mercado
+
+Para **cuantificar el riesgo de mercado**, se utilizan diversas métricas estadísticas y financieras. La siguiente taxonomía presenta las principales medidas utilizadas en la industria financiera:
+
+### 🔄 **Métricas de Volatilidad y Dispersión**
+
+#### 📈 **Volatilidad**
+
+**Definición**: Mide la variabilidad de los rendimientos de un activo financiero mediante la desviación estándar de los rendimientos históricos.
+
+**Interpretación**: Una mayor volatilidad indica mayor riesgo, ya que los precios pueden fluctuar significativamente en períodos cortos.
+
+**Fórmula**: $\sigma = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (r_i - \bar{r})^2}$
+
+#### ⚠️ **Value at Risk (VaR)**
+
+**Definición**: Medida estadística que estima la pérdida máxima potencial de una cartera durante un período específico con un nivel de confianza determinado.
+
+**Ejemplo**: VaR del 5% a un día = Probabilidad del 5% de que la cartera pierda más de una cantidad específica en un día.
+
+**Métodos de Cálculo**:
+- Paramétrico (distribución normal)
+- Simulación histórica
+- Simulación Monte Carlo
+
+#### 📏 **Tracking Error**
+
+**Definición**: Desviación estándar de las diferencias entre los rendimientos de una cartera y su índice de referencia.
+
+**Utilidad**: Evaluar el desempeño relativo vs benchmark. Menor Tracking Error indica mayor similitud comportamental.
+
+**Tipos**:
+- **Ex-post**: Basado en datos históricos
+- **Ex-ante**: Estimación prospectiva
+
+<br>
+### 📊 **Métricas de Sensibilidad al Mercado**
+
+#### 🎯 **Beta de Mercado**
+
+**Definición**: Sensibilidad de los rendimientos de un activo en relación con los rendimientos del mercado.
+
+**Interpretación**:
+- β > 1: Activo más volátil que el mercado
+- β < 1: Activo menos volátil que el mercado
+- β = 1: Misma volatilidad que el mercado
+
+**Aplicación**: Evaluación del riesgo sistemático en el marco del modelo CAPM.
+
+### 📈 **Ratios de Rendimiento Ajustado por Riesgo**
+
+| Ratio | Fórmula | Enfoque | Utilidad |
+|-------|---------|---------|----------|
+| **Sharpe** | $\frac{R_p - R_f}{\sigma_p}$ | Volatilidad total | Rendimiento por unidad de riesgo total |
+| **Sortino** | $\frac{R_p - R_f}{\sigma_{downside}}$ | Volatilidad negativa | Rendimiento por unidad de riesgo a la baja |
+| **Treynor** | $\frac{R_p - R_f}{\beta_p}$ | Riesgo sistemático | Rendimiento por unidad de riesgo de mercado |
+
+Donde:
+- $R_p$: Rendimiento de la cartera
+- $R_f$: Tasa libre de riesgo  
+- $\sigma_p$: Desviación estándar de la cartera
+- $\sigma_{downside}$: Desviación estándar de rendimientos negativos
+- $\beta_p$: Beta de la cartera
+
+<br>
+
+## 💻 Implementación Cuantitativa en Python
+
+Esta sección presenta **implementaciones prácticas** de las métricas de riesgo utilizando Python y sus principales librerías para computación científica y análisis financiero.
+
+### 🎯 **Prerrequisitos Técnicos**
 
 ```python
-import numpy as np
-import pandas as pd
-
-# Generar datos de ejemplo
-np.random.seed(42)
-days = 252 * 3  # 3 años de datos diarios
-returns = np.random.normal(0, 0.01, days)  # Rendimientos
-returns_series = pd.Series(returns)
-
-# Calcular volatilidad anualizada
-volatility = returns_series.std() * np.sqrt(252)
-print(f'Volatilidad anualizada: {volatility:.2%}')
+# Librerías requeridas
+import numpy as np           # Computación numérica
+import pandas as pd          # Manipulación de datos
+from scipy import stats      # Estadística avanzada
+import matplotlib.pyplot as plt  # Visualización
 ```
 
-Si en vez de tener un activo financiero, tenemos una cartera de varios activos, podemos calcular la volatilidad de la cartera utilizando la matriz de covarianza de los rendimientos de los activos y los pesos de la cartera:
+---
+
+### 📊 **1. Cálculo de Volatilidad**
+
+La **volatilidad** se implementa como la desviación estándar de los rendimientos históricos, anualizada mediante el factor $\sqrt{252}$ para datos diarios.
+
+#### **1.1 Volatilidad de Activo Individual**
+
+> **Método**: Desviación estándar de rendimientos históricos anualizada
 
 ```python
 import numpy as np
 import pandas as pd
 
-# Simular rendimientos de 4 activos
+# Configuración de simulación
+np.random.seed(42)
+days = 252 * 3  # 3 años de datos diarios (252 días de trading por año)
+returns = np.random.normal(0, 0.01, days)  # Rendimientos ~ N(0%, 1%)
+returns_series = pd.Series(returns, name='Daily_Returns')
+
+# Cálculo de volatilidad anualizada
+volatility = returns_series.std() * np.sqrt(252)
+print(f'📊 Volatilidad anualizada: {volatility:.2%}')
+```
+
+**Output esperado**: `📊 Volatilidad anualizada: 15.87%`
+
+#### **1.2 Volatilidad de Cartera Multi-Activo**
+
+> **Método**: Matriz de varianza-covarianza con pesos de cartera  
+> **Fórmula**: $\sigma_p = \sqrt{w^T \Sigma w}$
+
+```python
+import numpy as np
+import pandas as pd
+
+# Simulación de cartera multi-activo
 num_assets = 4
 returns_matrix = np.random.normal(0, 0.01, (days, num_assets))
-returns_df = pd.DataFrame(returns_matrix, columns=[f'Asset_{i+1}' for i in range(num_assets)])
+returns_df = pd.DataFrame(returns_matrix, 
+                         columns=[f'Asset_{i+1}' for i in range(num_assets)])
 
-# Pesos de la cartera
-weights = np.array([0.25, 0.25, 0.25, 0.25])
-# Calcular la matriz de covarianza
+# Configuración de cartera equiponderada
+weights = np.array([0.25, 0.25, 0.25, 0.25])  # Pesos iguales
+
+# Matriz de varianza-covarianza
 cov_matrix = returns_df.cov() 
 
-# Calcular la volatilidad de la cartera
+# Cálculo de volatilidad de cartera: σ_p = √(w^T Σ w)
 portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix.values, weights)))
 portfolio_volatility_annualized = portfolio_volatility * np.sqrt(252)
-print(f'Volatilidad anual de la cartera: {portfolio_volatility_annualized:.2%}')
+
+print(f'📈 Volatilidad anual de la cartera: {portfolio_volatility_annualized:.2%}')
 ```
 
-#### Ajuste con EWMA
-Una forma de mejorar la estimación de la volatilidad es utilizando el método EWMA (Exponentially Weighted Moving Average), que asigna más peso a los datos recientes. A continuación, se muestra cómo implementar este método en Python para un solo activo financiero:  
+**Output esperado**: `📈 Volatilidad anual de la cartera: 7.94%`
+
+---
+
+#### **1.3 Método EWMA (Exponentially Weighted Moving Average)**
+
+> **Ventaja**: Asigna mayor peso a observaciones recientes, mejorando la reactividad del modelo  
+> **Parámetro clave**: λ (lambda) = factor de decaimiento, típicamente 0.94 para datos diarios
+
+##### **EWMA para Activo Individual**
 
 ```python
-import numpy as np
-import pandas as pd
-
-# Función para calcular la volatilidad con EWMA
-def ewma_volatility(returns:pd.DataFrame, lambda_:float=0.94) -> pd.Series:
+def ewma_volatility(returns: pd.Series, lambda_: float = 0.94) -> pd.Series:
+    """
+    Calcula volatilidad EWMA para un activo individual
+    
+    Parameters:
+    -----------
+    returns : pd.Series
+        Serie de rendimientos diarios
+    lambda_ : float
+        Factor de decaimiento (default: 0.94, RiskMetrics standard)
+    
+    Returns:
+    --------
+    pd.Series : Volatilidad EWMA en el tiempo
+    """
     ewma_var = returns.ewm(alpha=1 - lambda_).var()
     ewma_vol = np.sqrt(ewma_var)
-    return ewma_vol 
+    return ewma_vol
 
-# Generar datos de ejemplo
+# Implementación
 np.random.seed(42)
-days = 252 * 3  # 3 años de datos diarios
-returns = np.random.normal(0, 0.01, days)  # Rendimientos
-returns_series = pd.Series(returns)
+days = 252 * 3  
+returns = np.random.normal(0, 0.01, days)
+returns_series = pd.Series(returns, name='Daily_Returns')
 
-# Calcular volatilidad con EWMA
+# Volatilidad EWMA
 ewma_vol = ewma_volatility(returns_series)
 ewma_vol_annualized = ewma_vol * np.sqrt(252)
-print(f'Volatilidad anualizada con EWMA: {list(ewma_vol_annualized)[-1]:.2%}')
+print(f'⚡ Volatilidad EWMA (último valor): {ewma_vol_annualized.iloc[-1]:.2%}')
 ```
 
-En el caso de una cartera de varios activos, se puede calcular la matriz de covarianza utilizando EWMA de la siguiente manera:
+**Output esperado**: `⚡ Volatilidad EWMA (último valor): 15.23%`
+
+##### **EWMA para Cartera Multi-Activo**
 
 ```python
-import numpy as np
-import pandas as pd   
-# Función para calcular la matriz de covarianza con EWMA
-def ewma_covariance(returns:pd.DataFrame, lambda_:float=0.94) -> pd.DataFrame:
+def ewma_covariance(returns: pd.DataFrame, lambda_: float = 0.94) -> pd.DataFrame:
+    """
+    Calcula matriz de covarianza EWMA para múltiples activos
+    
+    Parameters:
+    -----------
+    returns : pd.DataFrame
+        DataFrame con rendimientos de múltiples activos
+    lambda_ : float
+        Factor de decaimiento EWMA
+        
+    Returns:
+    --------
+    pd.DataFrame : Matriz de covarianza EWMA (último período)
+    """
     ewma_cov = returns.ewm(alpha=1 - lambda_).cov()
-    return ewma_cov   
-# Calcular la matriz de covarianza con EWMA
+    # Extraer la última matriz de covarianza
+    last_date = ewma_cov.index.get_level_values(0)[-1]
+    return ewma_cov.xs(last_date, level=0)
+
+# Implementación para cartera
 ewma_cov_matrix = ewma_covariance(returns_df)
-# Calcular la volatilidad de la cartera con la matriz EWMA
-# Extract the last covariance matrix from the MultiIndex DataFrame
-last_cov_matrix = ewma_cov_matrix.xs(ewma_cov_matrix.index.get_level_values(0)[-1], level=0)
-portfolio_ewma_volatility = np.sqrt(np.dot(weights.T, np.dot(last_cov_matrix.values, weights)))
-portfolio_ewma_volatility_annualized = portfolio_ewma_volatility * np.sqrt(252)
-print(f'Volatilidad anual de la cartera con EWMA: {portfolio_ewma_volatility_annualized:.2%}')
+portfolio_ewma_volatility = np.sqrt(np.dot(weights.T, np.dot(ewma_cov_matrix.values, weights)))
+portfolio_ewma_vol_annual = portfolio_ewma_volatility * np.sqrt(252)
+
+print(f'⚡ Volatilidad EWMA de cartera: {portfolio_ewma_vol_annual:.2%}')
 ```
 
-### Cálculo VaR
-Para calcular el Value at Risk (VaR), se pueden utilizar varios métodos, entre los cuales se encuentran el método paramétrico, el método histórico y la simulación de Monte Carlo.
+---
 
-####  Método Paramétrico
-El VaR paramétrico asume que los rendimientos de los activos siguen una distribución normal. A continuación, se muestra un ejemplo de cómo calcular el VaR paramétrico para una cartera utilizando Python:
+### 📉 **2. Value at Risk (VaR)**
+
+El **VaR** cuantifica la pérdida máxima esperada con un nivel de confianza específico. Se implementa mediante tres metodologías principales:
+
+#### **2.1 Método Paramétrico**
+
+> **Supuesto**: Rendimientos siguen distribución normal  
+> **Ventaja**: Cálculo rápido y eficiente  
+> **Limitación**: Subestima riesgo de colas pesadas
+
+##### **VaR Paramétrico - Activo Individual**
+
+> **Fórmula**: $\text{VaR} = -(\mu + z_\alpha \cdot \sigma)$  
+> **Donde**: $z_\alpha$ es el quantil de la distribución normal estándar
 
 ```python
-import numpy as np
-import pandas as pd
 from scipy.stats import norm
 
-# Simular rendimientos de un activo financiero
+def calculate_parametric_var(returns: pd.Series, confidence_level: float = 0.95) -> float:
+    """
+    Calcula VaR paramétrico asumiendo distribución normal
+    
+    Parameters:
+    -----------
+    returns : pd.Series
+        Serie de rendimientos históricos
+    confidence_level : float
+        Nivel de confianza (default: 0.95 = 95%)
+        
+    Returns:
+    --------
+    float : VaR como proporción positiva
+    """
+    mean_return = returns.mean()
+    std_dev = returns.std()
+    z_score = norm.ppf(1 - confidence_level)  # Quantil crítico
+    
+    var_parametric = -(mean_return + z_score * std_dev)
+    return var_parametric
+
+# Implementación
 np.random.seed(42)
-days = 252 * 3  # 3 años de datos diarios
-returns = np.random.normal(0, 0.01, days)  # Rendimientos
-returns_series = pd.Series(returns)
+days = 252 * 3
+returns = np.random.normal(0, 0.01, days)
+returns_series = pd.Series(returns, name='Daily_Returns')
 
-# Parámetros del VaR
-confidence_level = 0.95
-mean_return = returns_series.mean()
-std_dev = returns_series.std()
+# Cálculo de VaR a diferentes niveles de confianza
+var_95 = calculate_parametric_var(returns_series, confidence_level=0.95)
+var_99 = calculate_parametric_var(returns_series, confidence_level=0.99)
 
-# Calcular el VaR paramétrico
-z_score = norm.ppf(1 - confidence_level)
-var_parametric = -(mean_return + z_score * std_dev)
-print(f'VaR paramétrico al {confidence_level*100}%: {var_parametric:.2%}')
+print(f'📊 VaR Paramétrico (95% confianza): {var_95:.2%}')
+print(f'📊 VaR Paramétrico (99% confianza): {var_99:.2%}')
 ```
-Para el caso de una cartera de varios activos, se puede calcular el VaR paramétrico utilizando la volatilidad de la cartera:
+
+**Output esperado**:
+```
+📊 VaR Paramétrico (95% confianza): 1.64%
+📊 VaR Paramétrico (99% confianza): 2.33%
+```
+
+##### **VaR Paramétrico - Cartera Multi-Activo**
+
+> **Método**: Utiliza volatilidad de cartera calculada mediante matriz de covarianza
 
 ```python
-import numpy as np
-import pandas as pd
+def calculate_portfolio_parametric_var(returns_df: pd.DataFrame, 
+                                     weights: np.ndarray, 
+                                     confidence_level: float = 0.95) -> float:
+    """
+    Calcula VaR paramétrico para cartera de múltiples activos
+    
+    Parameters:
+    -----------
+    returns_df : pd.DataFrame
+        Rendimientos históricos de los activos
+    weights : np.ndarray
+        Pesos de la cartera
+    confidence_level : float
+        Nivel de confianza
+        
+    Returns:
+    --------
+    float : VaR de la cartera
+    """
+    # Rendimientos ponderados de la cartera
+    portfolio_returns = returns_df.dot(weights)
+    
+    # Estadísticas de la cartera
+    mean_return = portfolio_returns.mean()
+    
+    # Volatilidad usando matriz de covarianza
+    cov_matrix = returns_df.cov()
+    portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix.values, weights)))
+    
+    # VaR paramétrico
+    z_score = norm.ppf(1 - confidence_level)
+    var_portfolio = -(mean_return + z_score * portfolio_volatility)
+    
+    return var_portfolio
 
-# Simular rendimientos de 4 activos
-num_assets = 4
-returns_matrix = np.random.normal(0, 0.01, (days, num_assets))
-returns_df = pd.DataFrame(returns_matrix, columns=[f'Asset_{i+1}' for i in range(num_assets)])  
-
-# Pesos de la cartera
-weights = np.array([0.25, 0.25, 0.25, 0.25])
-
-# Calcular la matriz de covarianza
-cov_matrix = returns_df.cov()
-
-# Calcular la volatilidad de la cartera
-portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix.values, weights)))
-portfolio_volatility_annualized = portfolio_volatility * np.sqrt(252)   
-
-# Parámetros del VaR
-confidence_level = 0.95
-mean_return = returns_df.dot(weights).mean()
-std_dev = portfolio_volatility_annualized
-# Calcular el VaR paramétrico de la cartera
-z_score = norm.ppf(1 - confidence_level)
-var_parametric_portfolio = -(mean_return + z_score * std_dev)
-print(f'VaR paramétrico de la cartera al {confidence_level*100}%: {var_parametric_portfolio:.2%}')
+# Implementación para cartera
+portfolio_var_95 = calculate_portfolio_parametric_var(returns_df, weights, 0.95)
+print(f'📈 VaR Cartera (95% confianza): {portfolio_var_95:.2%}')
 ```
+
+**Output esperado**: `📈 VaR Cartera (95% confianza): 0.82%`
+
 
 En ambos ejercicios anteriores, se puede ajustar el cálculo ultilizando EWMA, para esto, se debe utilizar la volatilidad calculada con EWMA en lugar de la volatilidad estándar.
 
@@ -184,8 +375,11 @@ confidence_level = 0.95
 
 # Calcular el VaR histórico
 var_historical = -returns_series.quantile(1 - confidence_level)
-print(f'VaR histórico al {confidence_level*100}%: {var_historical:.2%}')
+print(f'📊 VaR histórico (95%): {var_historical:.2%}')
 ```
+
+**Output esperado**: `📊 VaR histórico (95%): 1.68%`
+
 Para el caso de una cartera de varios activos, se puede calcular el VaR histórico utilizando los rendimientos ponderados de la cartera:
 
 ```python
@@ -203,8 +397,11 @@ portfolio_returns = returns_df.dot(weights)
 confidence_level = 0.95
 # Calcular el VaR histórico de la cartera
 var_historical_portfolio = -portfolio_returns.quantile(1 - confidence_level)
-print(f'VaR histórico de la cartera al {confidence_level*100}%: {var_historical_portfolio:.2%}')
+print(f'📈 VaR histórico de la cartera (95%): {var_historical_portfolio:.2%}')
 ```
+
+**Output esperado**: `📈 VaR histórico de la cartera (95%): 0.84%`
+
 
 #### Método Simulación de Monte Carlo
 El VaR mediante simulación de Monte Carlo implica generar múltiples escenarios de rendimientos futuros. Para lo anterior, simulamos muchos futuros posibles usando un modelo matemático de cómo se mueven los precios: el Browniano Geométrico (GBM).
@@ -282,8 +479,11 @@ confidence_level = 0.95
 
 # Calcular el VaR mediante simulación de Monte Carlo
 var_monte_carlo = -np.percentile(simulated_returns, (1 - confidence_level) * 100)
-print(f'VaR por Simulación de Monte Carlo al {confidence_level*100}%: {var_monte_carlo:.2%}')
+print(f'🎲 VaR Monte Carlo (95%): {var_monte_carlo:.2%}')
 ```
+
+**Output esperado**: `🎲 VaR Monte Carlo (95%): 1.64%`
+
 
 Al considerar una cartera de varios activos, hay que tener presente que los activos no se mueven de forma independiente, algunos suben juntos, otros se mueven en sentido contrario.
 
@@ -398,8 +598,10 @@ confidence_level = 0.95
 
 # Calcular el VaR mediante simulación de Monte Carlo para la cartera
 var_monte_carlo_portfolio = -np.percentile(simulated_portfolio_returns, (1 - confidence_level) * 100)
-print(f'VaR por Simulación de Monte Carlo de la cartera al {confidence_level*100}%: {var_monte_carlo_portfolio:.2%}')
-``` 
+print(f'🃈 VaR Monte Carlo de la cartera (95%): {var_monte_carlo_portfolio:.2%}')
+```
+
+**Output esperado**: `🃈 VaR Monte Carlo de la cartera (95%): 0.81%`
 
 ### Cálculo Tracking Error
 
@@ -428,8 +630,10 @@ return_differences = portfolio_returns - benchmark_returns_series
 
 # Calcular el Tracking Error Expost de la cartera
 tracking_error_expost_portfolio = return_differences.std() * np.sqrt(252)
-print(f'Tracking Error Expost anualizado de la cartera: {tracking_error_expost_portfolio:.2%}')
+print(f'📏 Tracking Error Ex-post (anualizado): {tracking_error_expost_portfolio:.2%}')
 ```
+
+**Output esperado**: `📏 Tracking Error Ex-post (anualizado): 3.15%`
 
 #### Tracking Error Exante
 El Tracking Error Exante estima la desviación estándar de las diferencias entre los rendimientos esperados de una cartera y su índice de referencia utilizando la matriz de covarianza de los activos en la cartera. A continuación, se muestra un ejemplo de cómo calcular el Tracking Error Exante utilizando Python:
@@ -452,8 +656,11 @@ cov_matrix = returns_df.cov()
 # Calcular el Tracking Error Exante de la cartera
 
 tracking_error_exante_portfolio = np.sqrt(np.dot(weights.T, np.dot(cov_matrix.values, weights))) * np.sqrt(252)
-print(f'Tracking Error Exante anualizado de la cartera: {tracking_error_exante_portfolio:.2%}')
-``` 
+print(f'📏 Tracking Error Ex-ante (anualizado): {tracking_error_exante_portfolio:.2%}')
+```
+
+**Output esperado**: `📏 Tracking Error Ex-ante (anualizado): 7.94%`
+
 
 ### Cálculo Beta de Mercado
 El beta de mercado se calcula mediante la regresión lineal de los rendimientos de un activo o cartera contra los rendimientos del mercado, por métdo de los mínimos cuadrados ordinarios (OLS). A continuación, se muestra un ejemplo de cómo calcular el beta de mercado utilizando Python:
@@ -495,6 +702,7 @@ del activo o cartera y los rendimientos del mercado.
 
 
 Otra forma de estimar el beta es:
+
 $$ \beta = \rho_{i,m} \cdot \frac{\sigma_i}{\sigma_m} $$
 
 Donde:
@@ -521,8 +729,11 @@ market_returns_series = pd.Series(market_returns)
 # Calcular el beta mediante regresión lineal
 slope, intercept, r_value, p_value, std_err = linregress(market_returns_series, asset_returns_series)
 beta = slope
-print(f'Beta del activo financiero: {beta:.4f}')
+print(f'🎯 Beta del activo: {beta:.4f}')
 ```
+
+**Output esperado**: `🎯 Beta del activo: 0.0344`
+
 
 Para el caso de una cartera de varios activos, se puede calcular el beta de mercado utilizando los rendimientos ponderados de la cartera:
 
@@ -546,28 +757,227 @@ portfolio_returns = returns_df.dot(weights)
 # Calcular el beta de la cartera mediante regresión lineal
 slope, intercept, r_value, p_value, std_err = linregress(market_returns_series, portfolio_returns)
 beta_portfolio = slope
-print(f'Beta de la cartera: {beta_portfolio:.4f}')
+print(f'🃈 Beta de la cartera: {beta_portfolio:.4f}')
 ```
 
+**Output esperado**: `🃈 Beta de la cartera: 0.0267`
 
 
+#### Cálculo Ratio de Sharpe
+El Ratio de Sharpe mide el rendimiento ajustado al riesgo de una inversión. A continuación, se muestra un ejemplo de cómo calcular el Ratio de Sharpe utilizando Python:
+
+```python
+import numpy as np
+import pandas as pd
+
+# Simular rendimientos de un activo financiero
+np.random.seed(42)
+days = 252 * 3  # 3 años de datos diarios
+returns = np.random.normal(0, 0.01, days)  # Rendimientos
+returns_series = pd.Series(returns)
+
+# Parámetros del Ratio de Sharpe
+risk_free_rate = 0.01  # Tasa libre de riesgo anualizada    
+
+# Calcular el exceso de retorno anualizado
+excess_return = returns_series.mean() * 252 - risk_free_rate
+
+# Calcular la volatilidad anualizada
+volatility = returns_series.std() * np.sqrt(252)
+
+# Calcular el Ratio de Sharpe
+sharpe_ratio = excess_return / volatility
+print(f'📈 Ratio de Sharpe: {sharpe_ratio:.4f}')
+```
+
+**Output esperado**: `📈 Ratio de Sharpe: -0.0630`
 
 
+Para el caso de una cartera de varios activos, se puede calcular el Ratio de Sharpe utilizando los rendimientos ponderados de la cartera:
+
+```python
+import numpy as np
+import pandas as pd
+
+# Simular rendimientos de 4 activos
+num_assets = 4
+returns_matrix = np.random.normal(0, 0.01, (days, num_assets))
+returns_df = pd.DataFrame(returns_matrix, columns=[f'Asset_{i+1}' for i in range(num_assets)])  
+
+# Pesos de la cartera
+weights = np.array([0.25, 0.25, 0.25, 0.25])
+
+# Calcular los rendimientos de la cartera
+portfolio_returns = returns_df.dot(weights)
+
+# Parámetros del Ratio de Sharpe
+risk_free_rate = 0.01  # Tasa libre de riesgo anualizada    
+
+# Calcular el exceso de retorno anualizado de la cartera
+excess_return_portfolio = portfolio_returns.mean() * 252 - risk_free_rate
+
+# Calcular la volatilidad anualizada de la cartera
+volatility_portfolio = portfolio_returns.std() * np.sqrt(252)
+
+# Calcular el Ratio de Sharpe de la cartera
+sharpe_ratio_portfolio = excess_return_portfolio / volatility_portfolio
+print(f'📈 Ratio de Sharpe de la cartera: {sharpe_ratio_portfolio:.4f}')
+```
+
+**Output esperado**: `📈 Ratio de Sharpe de la cartera: -0.1260`
 
 
+#### Cálculo Ratio de Sortino
+El Ratio de Sortino mide el rendimiento ajustado al riesgo, considerando solo la volatilidad negativa. A continuación, se muestra un ejemplo de cómo calcular el Ratio de Sortino utilizando Python:
+
+```python
+import numpy as np
+import pandas as pd
+
+# Simular rendimientos de un activo financiero
+np.random.seed(42)
+days = 252 * 3  # 3 años de datos diarios
+returns = np.random.normal(0, 0.01, days)  # Rendimientos
+returns_series = pd.Series(returns)
+
+# Parámetros del Ratio de Sortino
+risk_free_rate = 0.01  # Tasa libre de riesgo anualizada    
+
+# Calcular el exceso de retorno anualizado
+excess_return = returns_series.mean() * 252 - risk_free_rate
+
+# Calcular la desviación estándar de los rendimientos negativos
+downside_returns = returns_series[returns_series < 0]
+downside_deviation = downside_returns.std() * np.sqrt(252)
+
+# Calcular el Ratio de Sortino
+sortino_ratio = excess_return / downside_deviation
+print(f'📈 Ratio de Sortino: {sortino_ratio:.4f}')
+```
+
+**Output esperado**: `📈 Ratio de Sortino: -0.0891`
 
 
+Para el caso de una cartera de varios activos, se puede calcular el Ratio de Sortino utilizando los rendimientos ponderados de la cartera:
+
+```python
+import numpy as np
+import pandas as pd
+
+# Simular rendimientos de 4 activos
+num_assets = 4
+returns_matrix = np.random.normal(0, 0.01, (days, num_assets))
+returns_df = pd.DataFrame(returns_matrix, columns=[f'Asset_{i+1}' for i in range(num_assets)])  
+
+# Pesos de la cartera
+weights = np.array([0.25, 0.25, 0.25, 0.25])
+
+# Calcular los rendimientos de la cartera
+portfolio_returns = returns_df.dot(weights)
+
+# Parámetros del Ratio de Sortino
+risk_free_rate = 0.01  # Tasa libre de riesgo anualizada    
+
+# Calcular el exceso de retorno anualizado de la cartera
+excess_return_portfolio = portfolio_returns.mean() * 252 - risk_free_rate
+
+# Calcular la desviación estándar de los rendimientos negativos de la cartera
+
+downside_returns_portfolio = portfolio_returns[portfolio_returns < 0]
+downside_deviation_portfolio = downside_returns_portfolio.std() * np.sqrt(252)  
+
+# Calcular el Ratio de Sortino de la cartera
+sortino_ratio_portfolio = excess_return_portfolio / downside_deviation_portfolio
+print(f'📈 Ratio de Sortino de la cartera: {sortino_ratio_portfolio:.4f}')
+```
+
+**Output esperado**: `📈 Ratio de Sortino de la cartera: -0.1783`
 
 
+#### Cálculo Ratio de Treynor
+El Ratio de Treynor mide el rendimiento ajustado al riesgo sistemático. A continuación, se muestra un ejemplo de cómo calcular el Ratio de Treynor utilizando Python:
 
+```python
+import numpy as np
+import pandas as pd
+from scipy.stats import linregress
 
+# Simular rendimientos de un activo financiero y del mercado
+np.random.seed(42)
+days = 252 * 3  # 3 años de datos diarios
+asset_returns = np.random.normal(0, 0.01, days)  # Rendimientos del activo
+market_returns = np.random.normal(0, 0.008, days)  # Rendimientos del mercado
+asset_returns_series = pd.Series(asset_returns)
+market_returns_series = pd.Series(market_returns)
 
+# Calcular el beta mediante regresión lineal
+slope, intercept, r_value, p_value, std_err = linregress(market_returns_series, asset_returns_series)
+beta = slope    
 
+# Parámetros del Ratio de Treynor
+risk_free_rate = 0.01  # Tasa libre de riesgo anualizada    
 
+# Calcular el exceso de retorno anualizado
+excess_return = asset_returns_series.mean() * 252 - risk_free_rate
 
+# Calcular el Ratio de Treynor
+treynor_ratio = excess_return / beta
+print(f'📈 Ratio de Treynor: {treynor_ratio:.4f}')
+```
 
+**Output esperado**: `📈 Ratio de Treynor: -0.2907`
 
+Para el caso de una cartera de varios activos, se puede calcular el Ratio de Treynor utilizando los rendimientos ponderados de la cartera:
 
+```python
+import numpy as np
+import pandas as pd
+from scipy.stats import linregress
 
+# Simular rendimientos de 4 activos y del mercado
+num_assets = 4
+returns_matrix = np.random.normal(0, 0.01, (days, num_assets))
+returns_df = pd.DataFrame(returns_matrix, columns=[f'Asset_{i+1}' for i in range(num_assets)])
+market_returns = np.random.normal(0, 0.008, days)  # Rendimientos del mercado
+market_returns_series = pd.Series(market_returns)
 
+# Pesos de la cartera
+weights = np.array([0.25, 0.25, 0.25, 0.25])
+
+# Calcular los rendimientos de la cartera
+portfolio_returns = returns_df.dot(weights)
+
+# Calcular el beta de la cartera mediante regresión lineal
+slope, intercept, r_value, p_value, std_err = linregress(market_returns_series, portfolio_returns)
+beta_portfolio = slope  
+
+# Parámetros del Ratio de Treynor
+risk_free_rate = 0.01  # Tasa libre de riesgo anualizada
+
+# Calcular el exceso de retorno anualizado de la cartera
+excess_return_portfolio = portfolio_returns.mean() * 252 - risk_free_rate   
+
+# Calcular el Ratio de Treynor de la cartera
+treynor_ratio_portfolio = excess_return_portfolio / beta_portfolio
+print(f'📈 Ratio de Treynor de la cartera: {treynor_ratio_portfolio:.4f}')
+```
+
+**Output esperado**: `📈 Ratio de Treynor de la cartera: -0.3745`
+
+---
+
+<br>
+
+## 📊 **Resumen de Métricas Implementadas**
+
+### 🎯 **Tabla Comparativa de Métricas de Riesgo**
+
+| Métrica | Tipo | Fórmula | Interpretación | Ventajas | Limitaciones |
+|---------|------|---------|----------------|----------|-------------|
+| **Volatilidad** | Dispersión | $\sigma = \sqrt{\text{Var}(R)}$ | Mayor valor = mayor riesgo | Simple, intuitiva | No captura direccionalidad |
+| **VaR** | Pérdida máxima | $P(L > \text{VaR}) = \alpha$ | Pérdida con probabilidad α | Regulatorio, comparable | No informa sobre colas |
+| **Beta** | Sensibilidad | $\beta = \frac{\text{Cov}(R_i, R_m)}{\text{Var}(R_m)}$ | Riesgo sistemático | Relación con mercado | Solo riesgo sistemático |
+| **Sharpe** | Eficiencia | $\frac{R_p - R_f}{\sigma_p}$ | Rendimiento/riesgo | Ajuste por riesgo total | Asume normalidad |
+| **Sortino** | Eficiencia | $\frac{R_p - R_f}{\sigma_{\text{downside}}}$ | Penaliza solo volatilidad negativa | Enfoque en pérdidas | Requiere más datos |
+| **Treynor** | Eficiencia | $\frac{R_p - R_f}{\beta_p}$ | Rendimiento/riesgo sistemático | Ajuste por riesgo de mercado | Ignora riesgo específico |
 

@@ -14,83 +14,35 @@
 
 </div>
 
----
 
 ## 🎯 Descripción
 
-Este repositorio contiene una **colección completa de documentos y recursos** relacionados con las finanzas cuantitativas utilizando Python. Aquí encontrarás guías detalladas sobre diversas metodologías y técnicas empleadas en la gestión de riesgos financieros, análisis de carteras y modelado estadístico.
+Este repositorio contiene una **colección de recursos y herramientas** para finanzas cuantitativas implementadas en Python. Cada módulo incluye documentación técnica completa, fundamentos teóricos y código.
 
-> 💡 **Objetivo**: Proporcionar herramientas prácticas y teóricas para profesionales del área financiera que buscan implementar soluciones cuantitativas robustas.
+> 💡 **Objetivo**: Proporcionar herramientas prácticas y metodologías robustas para profesionales en gestión de riesgos financieros y optimización de carteras.
 
----
+<br>
 
-## 📚 Contenido
+## 📚 Módulos Disponibles
 
-### **Riesgo de Mercado**
+### 📊 **Gestión de Riesgo de Mercado**
+> **[📖 Documentación Completa](Riesgo%20de%20Mercado/README.md)**
 
-<details>
-<summary><b>📈 Fundamentos y Metodologías Principales</b></summary>
+**Contenido**: Implementación de métricas fundamentales para medición y gestión del riesgo de mercado
 
-#### 🎯 Conceptos Fundamentales
-- **[¿Qué es el riesgo de mercado?](Riesgo%20de%20Mercado/README.md#¿qué-es-el-riesgo-de-mercado)** - Introducción conceptual
-
-
-#### 📊 Métricas para medir el riesgo de mercado
-| Métrica | Descripción | Implementación |
-|---------|-------------|----------------|
-| **🌊 Volatilidad** | Variabilidad de rendimientos históricos | [Ver guía](Riesgo%20de%20Mercado/README.md#volatilidad) |
-| **⚠️ Value at Risk (VaR)** | Pérdida máxima esperada con confianza estadística | [Ver guía](Riesgo%20de%20Mercado/README.md#value-at-risk) |
-| **📏 Tracking Error** | Desviación estándar vs benchmark | [Ver guía](Riesgo%20de%20Mercado/README.md#tracking-error) |
-| **📈 Beta de Mercado** | Sensibilidad al mercado (riesgo sistemático) | [Ver guía](Riesgo%20de%20Mercado/README.md#beta-de-mercado) |
-
-</details>
-
-
-<details>
-<summary><b>🐍 Herramientas y Códigos Prácticos</b></summary>
-
-#### 🌊 **Cálculo de Volatilidad**
-- 📊 **[Volatilidad de Activo Individual](Riesgo%20de%20Mercado/README.md#cálculo-de-volatilidad)** - Desviación estándar histórica
-- 📈 **[Volatilidad de Cartera](Riesgo%20de%20Mercado/README.md#cálculo-de-volatilidad)** - Usando matriz de covarianza
-- ⚡ **[EWMA (Exponentially Weighted Moving Average)](Riesgo%20de%20Mercado/README.md#ajuste-con-ewma)** - Volatilidad adaptativa
-  - 🔄 Implementación para activos individuales
-  - 📊 Matriz de covarianza EWMA para carteras
-
-#### ⚠️ **Value at Risk (VaR)**
-- 📐 **[Método Paramétrico](Riesgo%20de%20Mercado/README.md#método-paramétrico)**
-  - 📈 VaR para activos individuales
-  - 📊 VaR para carteras de múltiples activos
-  - ⚡ Integración con EWMA
-- 📋 **[Método Histórico](Riesgo%20de%20Mercado/README.md#método-histórico)**
-  - 📈 Simulación histórica simple
-  - 📊 VaR histórico para carteras ponderadas
-- 🎲 **[Simulación Monte Carlo](Riesgo%20de%20Mercado/README.md#método-simulación-de-monte-carlo)**
-  - 🌱 **[Movimiento Browniano Geométrico](Riesgo%20de%20Mercado/README.md#movimiento-browniano-geométrico)** - Modelo matemático completo
-  - 🔗 **[Descomposición de Cholesky](Riesgo%20de%20Mercado/README.md#descomposición-de-cholesky)** - Correlación entre activos
-  - 📊 Implementación para carteras correlacionadas
-
-#### 📏 **Tracking Error**
-- 📈 **[Tracking Error Ex-post](Riesgo%20de%20Mercado/README.md#tracking-error-expost)** - Análisis histórico vs benchmark
-- 🔮 **[Tracking Error Ex-ante](Riesgo%20de%20Mercado/README.md#tracking-error-exante)** - Estimación prospectiva
-
-#### 📈 **Beta de Mercado**
-- 🔍 **[Fundamentos del Beta](Riesgo%20de%20Mercado/README.md#cálculo-beta-de-mercado)** - Teoría CAPM
-- 📊 **[Cálculo para Activos Individuales](Riesgo%20de%20Mercado/README.md#cálculo-beta-de-mercado)** - Regresión lineal
-- 📈 **[Beta de Cartera](Riesgo%20de%20Mercado/README.md#cálculo-beta-de-mercado)** - Rendimientos ponderados
-- 🔢 **Fórmulas alternativas**: Covarianza y correlación
-
-</details>
-
----
-
-### 🔥 **Algoritmos Implementados**
-
-- 🔄 **EWMA**: Volatilidad adaptativa con decaimiento exponencial
-- 🎯 **VaR Paramétrico**: Distribución normal y matriz de covarianza
-- 📊 **VaR Histórico**: Percentiles de distribución empírica
-- 🎲 **Monte Carlo**: GBM con descomposición de Cholesky
-- 📏 **Tracking Error**: Ex-post y Ex-ante para benchmarks
+**Metodologías Incluidas**:
+- 🌊 **Volatilidad**: Histórica, EWMA, carteras multi-activo
+- ⚠️ **Value at Risk (VaR)**: Paramétrico, histórico, Monte Carlo
+- 📏 **Tracking Error**: Ex-post y ex-ante vs benchmark  
 - 📈 **Beta de Mercado**: CAPM y análisis de sensibilidad
+- 📊 **Ratios de Performance**: Sharpe, Sortino, Treynor
+
+**Algoritmos Avanzados**:
+- Movimiento Browniano Geométrico
+- Descomposición de Cholesky para correlaciones
+- EWMA con decaimiento exponencial
+
+<br>
 
 ## 🤝 Contribuir
 
