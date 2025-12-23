@@ -1,13 +1,7 @@
 <div align="center">
 
 # 📊 Gestión de Riesgo de Mercado
-## *Implementación Cuantitativa con Python*
-
-
-
-![Python](https://img.shields.io/badge/Python-Financial%20Risk-blue?style=for-the-badge&logo=python)
-![NumPy](https://img.shields.io/badge/NumPy-Mathematical%20Computing-013243?style=for-the-badge&logo=numpy)
-![SciPy](https://img.shields.io/badge/SciPy-Statistical%20Analysis-8CAAE6?style=for-the-badge&logo=scipy)
+### *Implementación Cuantitativa con Python*
 
 </div>
 
@@ -17,10 +11,10 @@
 
 El **riesgo de mercado** se refiere a la posibilidad de que el valor de una inversión disminuya debido a cambios en las condiciones del mercado financiero. Este tipo de riesgo es **sistemático** y afecta a todos los activos financieros, incluyendo:
 
-- **🏛️ Acciones** - Riesgo de precio y volatilidad
-- **📋 Bonos** - Riesgo de tasa de interés y crédito  
-- **💱 Divisas** - Riesgo cambiario
-- **📈 Derivados** - Riesgo de subyacente y volatilidad
+- **Acciones** - Riesgo de precio y volatilidad
+- **Bonos** - Riesgo de tasa de interés y crédito  
+- **Divisas** - Riesgo cambiario
+- **Derivados** - Riesgo de subyacente y volatilidad
 
 <br>
 
@@ -28,10 +22,10 @@ El **riesgo de mercado** se refiere a la posibilidad de que el valor de una inve
 
 | Factor | Descripción | Impacto |
 |--------|-------------|----------|
-| **📈 Tasas de Interés** | Fluctuaciones en política monetaria | Alto |
-| **💹 Precios de Activos** | Movimientos del mercado | Directo |
-| **⚡ Volatilidad** | Incertidumbre e inestabilidad | Variable |
-| **🌍 Eventos Macro** | Políticos, económicos, geopolíticos | Sistémico |
+| **Tasas de Interés** | Fluctuaciones en política monetaria | Alto |
+| **Precios de Activos** | Movimientos del mercado | Directo |
+| **Volatilidad** | Incertidumbre e inestabilidad | Variable |
+| **Eventos Macro** | Políticos, económicos, geopolíticos | Sistémico |
 
 <br>
 
@@ -47,7 +41,6 @@ Para **cuantificar el riesgo de mercado**, se utilizan diversas métricas estad�
 
 **Interpretación**: Una mayor volatilidad indica mayor riesgo, ya que los precios pueden fluctuar significativamente en períodos cortos.
 
-**Fórmula**: $\sigma = \sqrt{\frac{1}{n-1} \sum_{i=1}^{n} (r_i - \bar{r})^2}$
 
 #### **Value at Risk (VaR)**
 
@@ -113,6 +106,7 @@ Esta sección presenta **implementaciones prácticas** de las métricas de riesg
 import numpy as np           # Computación numérica
 import pandas as pd          # Manipulación de datos
 from scipy import stats      # Estadística avanzada
+import matplotlib.pyplot as plt  # Visualización de datos
 ```
 
 ---
@@ -829,8 +823,27 @@ print(f'🃈 Beta de la cartera: {beta_portfolio:.4f}')
 **Output esperado**: `🃈 Beta de la cartera: 0.0267`
 
 
-#### Cálculo Ratio de Sharpe
-El Ratio de Sharpe mide el rendimiento ajustado al riesgo de una inversión. A continuación, se muestra un ejemplo de cómo calcular el Ratio de Sharpe utilizando Python:
+### **5 Cálculo de Ratios**
+#### **5.1 Ratio de Sharpe**
+
+El Ratio de Sharpe es una métrica fundamental en finanzas que mide el exceso de rentabilidad por unidad de riesgo asumido. Fue desarrollado por el premio Nobel William F. Sharpe en 1966.
+
+El Ratio de Sharpe se calcula mediante la siguiente fórmula:
+
+$$Sharpe  = (R_p - R_f) / \sigma_p$$
+
+Donde:
+- $R_p$: Rentabilidad promedio del portafolio o activo
+- $R_f$: Tasa libre de riesgo (risk-free rate)
+- $\sigma_p$: Desviación estándar de los retornos del portafolio (volatilidad)
+
+Interpretación del Ratio de Sharpe:
+
+- **Sharpe > 1:** Considerado bueno. La inversión genera retornos superiores al riesgo asumido
+- **Sharpe < 1:** La inversión puede no estar compensando adecuadamente el riesgo
+- **Sharpe < 0:** Los retornos son inferiores a la tasa libre de riesgo
+
+A continuación, se muestra un ejemplo de cómo calcular el Ratio de Sharpe utilizando Python:
 
 ```python
 import numpy as np
@@ -893,8 +906,32 @@ print(f'📈 Ratio de Sharpe de la cartera: {sharpe_ratio_portfolio:.4f}')
 **Output esperado**: `📈 Ratio de Sharpe de la cartera: -0.1260`
 
 
-#### Cálculo Ratio de Sortino
-El Ratio de Sortino mide el rendimiento ajustado al riesgo, considerando solo la volatilidad negativa. A continuación, se muestra un ejemplo de cómo calcular el Ratio de Sortino utilizando Python:
+#### **5.2 Ratio de Sortino**
+
+El Ratio de Sortino es una métrica de evaluación de rendimiento que mide el retorno ajustado por riesgo de una inversión, considerando únicamente la volatilidad negativa (downside risk) en lugar de la volatilidad total como lo hace el Ratio de Sharpe.
+
+El Ratio de Sortino se calcula mediante la siguiente fórmula:
+
+$$Sortino = (R_p - R_f) / \sigma_d$$
+
+Donde:
+- $R_p$: Retorno promedio de la cartera o activo
+- $R_f$: Tasa libre de riesgo (risk-free rate) o retorno mínimo aceptable (MAR - Minimum Acceptable Return)
+- $\sigma_d$: Desviación estándar de los retornos negativos (downside deviation)
+
+**Características principales**:
+
+- **Enfoque en pérdidas**: A diferencia del Ratio de Sharpe, solo penaliza la volatilidad negativa, considerando que la volatilidad al alza es deseable para los inversionistas.
+- **Retorno mínimo aceptable**: Permite definir un umbral personalizado (MAR) en lugar de usar necesariamente la tasa libre de riesgo.
+- **Interpretación**: Un ratio mayor indica mejor rendimiento ajustado por riesgo negativo. Valores superiores a 2 se consideran muy buenos, mientras que valores inferiores a 1 son cuestionables.
+
+**Ventajas sobre el Ratio de Sharpe**:
+
+1. Distingue entre volatilidad "buena" (ganancias) y "mala" (pérdidas)
+2. Más apropiado para distribuciones asimétricas de retornos
+3. Mejor para reflejar la aversión al riesgo de los inversionistas que se preocupan principalmente por las pérdidas.
+
+A continuación, se muestra un ejemplo de cómo calcular el Ratio de Sortino utilizando Python:
 
 ```python
 import numpy as np
@@ -960,8 +997,40 @@ print(f'📈 Ratio de Sortino de la cartera: {sortino_ratio_portfolio:.4f}')
 **Output esperado**: `📈 Ratio de Sortino de la cartera: -0.1783`
 
 
-#### Cálculo Ratio de Treynor
-El Ratio de Treynor mide el rendimiento ajustado al riesgo sistemático. A continuación, se muestra un ejemplo de cómo calcular el Ratio de Treynor utilizando Python:
+#### **5.3 Ratio de Treynor**
+
+El **Ratio de Treynor** (también conocido como índice de recompensa a volatilidad) es una métrica financiera que mide el exceso de rentabilidad obtenido por unidad de riesgo sistemático asumido. Este indicador es especialmente útil para evaluar el desempeño de carteras de inversión diversificadas.
+
+El Ratio de Treynor se calcula mediante la siguiente fórmula:
+
+$$Treynor = (R_p - R_f) / \beta_p$$
+
+Donde:
+- **Rp**: Rentabilidad de la cartera o activo
+- **Rf**: Tasa libre de riesgo (risk-free rate)
+- **βp**: Beta de la cartera, que mide la sensibilidad del activo respecto al mercado (riesgo sistemático)
+
+**Características Principales**:
+
+- **Enfoque en Riesgo Sistemático**: A diferencia del Ratio de Sharpe que utiliza la desviación estándar (riesgo total), el Ratio de Treynor utiliza Beta, que representa únicamente el riesgo sistemático o no diversificable.
+
+- **Ideal para Carteras Diversificadas**: Es más apropiado para evaluar carteras bien diversificadas donde el riesgo no sistemático ha sido minimizado.
+
+- **Interpretación**: Un ratio más alto indica mejor desempeño ajustado al riesgo. Valores positivos sugieren que la cartera supera la tasa libre de riesgo, mientras que valores negativos indican lo contrario.
+
+**Ventajas**:
+
+- Útil para comparar fondos o carteras dentro de un mismo mercado
+- Considera solo el riesgo que no puede eliminarse mediante diversificación
+- Permite evaluar la habilidad del gestor para generar rendimientos adicionales por cada unidad de riesgo de mercado asumido
+
+**Limitaciones**:
+
+- Requiere que la cartera esté adecuadamente diversificada
+- Asume que Beta es una medida estable del riesgo, lo cual puede no ser cierto en períodos de alta volatilidad
+- No es útil para comparar activos individuales con alto riesgo no sistemático
+
+A continuación, se muestra un ejemplo de cómo calcular el Ratio de Treynor utilizando Python:
 
 ```python
 import numpy as np
