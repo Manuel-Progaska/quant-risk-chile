@@ -1,7 +1,6 @@
 <div align="center">
 
 # 📊 Gestión de Riesgo de Mercado
-### *Implementación Cuantitativa con Python*
 
 </div>
 
@@ -35,14 +34,15 @@ Para **cuantificar el riesgo de mercado**, se utilizan diversas métricas estad�
 
 ### **Métricas de Volatilidad y Dispersión**
 
-#### **Volatilidad**
+**<u>Volatilidad</u>**
+
 
 **Definición**: Mide la variabilidad de los rendimientos de un activo financiero mediante la desviación estándar de los rendimientos históricos.
 
 **Interpretación**: Una mayor volatilidad indica mayor riesgo, ya que los precios pueden fluctuar significativamente en períodos cortos.
 
 
-#### **Value at Risk (VaR)**
+**<u>Value at Risk (VaR)</u>**
 
 **Definición**: Medida estadística que estima la pérdida máxima potencial de una cartera durante un período específico con un nivel de confianza determinado.
 
@@ -53,7 +53,7 @@ Para **cuantificar el riesgo de mercado**, se utilizan diversas métricas estad�
 - Simulación histórica.
 - Simulación Monte Carlo.
 
-#### **Tracking Error**
+**<u>Tracking Error</u>**
 
 **Definición**: Desviación estándar de las diferencias entre los rendimientos de una cartera y su índice de referencia.
 
@@ -67,7 +67,7 @@ Para **cuantificar el riesgo de mercado**, se utilizan diversas métricas estad�
 
 ### **Métricas de Sensibilidad al Mercado**
 
-#### **Beta de Mercado**
+**<u>Beta de Mercado</u>**
 
 **Definición**: Sensibilidad de los rendimientos de un activo en relación con los rendimientos del mercado.
 
@@ -122,8 +122,6 @@ La **volatilidad** es una medida estadística que cuantifica la dispersión de l
 #### **1.1 Volatilidad de Activo Individual**
 
 > **Método**: Desviación estándar de rendimientos históricos
-
-El estimador por excelencia de la volatilidad es la desviación estándar de los retornos históricos.
 
 La fórmula de la desviación estándar es:
 
@@ -209,12 +207,14 @@ Lo anterior se puede resumir de la siguiente manera:
 
 $$\sigma_p^2 = w^T \cdot \Sigma \cdot w$$
 
+$$ \sigma = \sqrt{w^T \cdot \Sigma \cdot w}$$
+
 Donde:
 
-- $\sigma_p^2$: Varianza de la cartera
-- $w$: Vector de pesos de la cartera
+- $\sigma_p$: Desviación estandar (volatilidad) de la cartera.
+- $w$: Vector de pesos de la cartera.
 - $w^T$: Vector de pesos de la cartera transpuesto.
-- $\Sigma$: Matriz de varianza-covarianza de los activos
+- $\Sigma$: Matriz de varianza-covarianza de los activos.
 
 A continuación, se muestra un ejemplo de cómo calcular la volatilidad de una cartera multi-activo utilizando Python:
 
@@ -840,15 +840,12 @@ El Tracking Error Expost mide la desviación estándar de las diferencias entre 
 
 **Fórmula del Tracking Error Expost**:
 
-$$TE_{expost} = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (R_{p,i} - R_{b,i} - \overline{R_{p} - R_{b}})^2}$$
+$$TE_{expost} = \sigma(R_p - R_b)$$
 
 Donde:
-- $TE_{expost}$: Tracking Error Ex-post
-- $N$: Número de observaciones (períodos)
-- $R_{p,i}$: Rendimiento de la cartera en el período $i$
-- $R_{b,i}$: Rendimiento del benchmark en el período $i$
-- $(R_{p,i} - R_{b,i})$: Diferencia de rendimiento en el período $i$
-- $\overline{R_{p} - R_{b}}$: Media de las diferencias de rendimiento
+- $(R_p)$: Rendimiento de la cartera
+- $(R_b)$: Rendimiento del benchmark
+- $\sigma$: Desviación estándar de las diferencias de rendimiento
 
 **Interpretación**: Un Tracking Error Expost del 3% anualizado significa que históricamente la cartera se ha desviado en promedio un 3% por año respecto al benchmark.
 
@@ -885,7 +882,7 @@ tracking_error_expost_portfolio = tracking_error_daily * np.sqrt(252)
 print(f'📏 Tracking Error Ex-post (diario): {tracking_error_daily:.4%}')
 print(f'📏 Tracking Error Ex-post (anualizado): {tracking_error_expost_portfolio:.2%}')
 ```
-**Output esperado**: `📏 Tracking Error Ex-post (anualizado): 3.15%`
+**Output esperado**: `📏 Tracking Error Ex-post (anualizado): 15.07%`
 
 
 #### **3.2 Tracking Error Exante**
@@ -903,14 +900,7 @@ Donde:
 - $(w_p - w_b)$: Vector de pesos activos (active weights)
 - $(\Sigma)$: Matriz de covarianza de los retornos de los activos
 
-**Descomposición del Cálculo**:
-
-1. **Pesos Activos**: La diferencia $(w_p - w_b)$ representa cuánto se desvía cada posición de la cartera respecto al benchmark
-2. **Contribución de Covarianza**: El producto $(w_p - w_b)^T \cdot \Sigma \cdot (w_p - w_b)$ captura:
-    - La varianza de cada posición activa
-    - Las covarianzas entre todas las posiciones activas
-3. **Raíz Cuadrada**: Transforma la varianza en desviación estándar (volatilidad)
-
+A continuación, se muestra un ejemplo de cómo calcular el Tracking Error Exante utilizando Python:
 
 ```python
 import numpy as np
@@ -935,13 +925,7 @@ active_weights = portfolio_weights - benchmark_weights
 # Calcular la matriz de covarianza de los activos
 cov_matrix = returns_df.cov()
 
-# Fórmula del Tracking Error Ex-ante:
-# TE = √(w_active^T × Σ × w_active)
-# Donde:
-# - w_active: Vector de pesos activos (diferencia entre cartera y benchmark)
-# - Σ: Matriz de covarianza de los retornos de los activos
-# - El resultado es la desviación estándar de los retornos activos
-
+# Calcular el Tracking Error Ex-ante
 tracking_error_exante = np.sqrt(np.dot(active_weights.T, np.dot(cov_matrix.values, active_weights)))
 
 # Anualizar el Tracking Error (multiplicar por √252 para datos diarios)
@@ -950,7 +934,7 @@ tracking_error_exante_annualized = tracking_error_exante * np.sqrt(252)
 print(f'📏 Tracking Error Ex-ante (anualizado): {tracking_error_exante_annualized:.2%}')
 ```
 
-**Output esperado**: `📏 Tracking Error Ex-ante (anualizado): 2.36%`
+**Output esperado**: `📏 Tracking Error Ex-ante (anualizado): 1.93%`
 
 **Diferencias Clave entre Ex-ante y Ex-post**:
 
@@ -1036,7 +1020,7 @@ beta = slope
 print(f'🎯 Beta del activo: {beta:.4f}')
 ```
 
-**Output esperado**: `🎯 Beta del activo: 0.0344`
+**Output esperado**: `🎯 Beta del activo: 0.0042`
 
 
 Para el caso de una cartera de varios activos, se puede calcular el beta de mercado utilizando los rendimientos ponderados de la cartera:
@@ -1064,7 +1048,7 @@ beta_portfolio = slope
 print(f'🃈 Beta de la cartera: {beta_portfolio:.4f}')
 ```
 
-**Output esperado**: `🃈 Beta de la cartera: 0.0267`
+**Output esperado**: `🃈 Beta de la cartera: 0.0033`
 
 
 ### **5 Cálculo de Ratios**
@@ -1113,7 +1097,7 @@ sharpe_ratio = excess_return / volatility
 print(f'📈 Ratio de Sharpe: {sharpe_ratio:.4f}')
 ```
 
-**Output esperado**: `📈 Ratio de Sharpe: -0.0630`
+**Output esperado**: `📈 Ratio de Sharpe: -0.3596`
 
 
 Para el caso de una cartera de varios activos, se puede calcular el Ratio de Sharpe utilizando los rendimientos ponderados de la cartera:
@@ -1147,7 +1131,7 @@ sharpe_ratio_portfolio = excess_return_portfolio / volatility_portfolio
 print(f'📈 Ratio de Sharpe de la cartera: {sharpe_ratio_portfolio:.4f}')
 ```
 
-**Output esperado**: `📈 Ratio de Sharpe de la cartera: -0.1260`
+**Output esperado**: `📈 Ratio de Sharpe de la cartera: 0.9530`
 
 
 #### **5.2 Ratio de Sortino**
@@ -1162,6 +1146,7 @@ Donde:
 - $R_p$: Retorno promedio de la cartera o activo
 - $R_f$: Tasa libre de riesgo (risk-free rate) o retorno mínimo aceptable (MAR - Minimum Acceptable Return)
 - $\sigma_d$: Desviación estándar de los retornos negativos (downside deviation)
+
 
 **Características principales**:
 
@@ -1202,7 +1187,7 @@ sortino_ratio = excess_return / downside_deviation
 print(f'📈 Ratio de Sortino: {sortino_ratio:.4f}')
 ```
 
-**Output esperado**: `📈 Ratio de Sortino: -0.0891`
+**Output esperado**: `📈 Ratio de Sortino: -0.6203`
 
 
 Para el caso de una cartera de varios activos, se puede calcular el Ratio de Sortino utilizando los rendimientos ponderados de la cartera:
@@ -1238,7 +1223,7 @@ sortino_ratio_portfolio = excess_return_portfolio / downside_deviation_portfolio
 print(f'📈 Ratio de Sortino de la cartera: {sortino_ratio_portfolio:.4f}')
 ```
 
-**Output esperado**: `📈 Ratio de Sortino de la cartera: -0.1783`
+**Output esperado**: `📈 Ratio de Sortino de la cartera: -2.4403`
 
 
 #### **5.3 Ratio de Treynor**
@@ -1341,7 +1326,7 @@ treynor_ratio_portfolio = excess_return_portfolio / beta_portfolio
 print(f'📈 Ratio de Treynor de la cartera: {treynor_ratio_portfolio:.4f}')
 ```
 
-**Output esperado**: `📈 Ratio de Treynor de la cartera: -0.3745`
+**Output esperado**: `📈 Ratio de Treynor de la cartera: 3.3323`
 
 ---
 
