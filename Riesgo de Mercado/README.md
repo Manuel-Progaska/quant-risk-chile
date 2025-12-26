@@ -112,7 +112,7 @@ import matplotlib.pyplot as plt  # Visualización de datos
 ---
 
 ### **1. Cálculo de Volatilidad**
-Se calcula como la desviación estándar de los rendimientos históricos y representa el grado de variabilidad o incertidumbre en los retornos esperados.
+La **volatilidad** es una medida estadística que cuantifica la dispersión de los rendimientos de un activo financiero. Se calcula comúnmente como la desviación estándar de los retornos históricos.
 
 **Interpretación Práctica:**
 - Mayor volatilidad → Mayor riesgo → Fluctuaciones de precio más amplias
@@ -126,6 +126,7 @@ Se calcula como la desviación estándar de los rendimientos históricos y repre
 El estimador por excelencia de la volatilidad es la desviación estándar de los retornos históricos.
 
 La fórmula de la desviación estándar es:
+
 $$\sigma = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (r_i - \bar{r})^2}$$
 
 Donde:
@@ -166,8 +167,6 @@ Esta característica de la forma de escalar la desviación estandar, se aplica e
 
 Para obtener la desviación estándar de la cartera, primero es necesario calcular su varianza total. Para comprender este cálculo, es fundamental entender la propiedad de la suma de varianzas.
 
-**Propiedad de la Suma de Varianzas**
-
 Para dos variables aleatorias $X$ y $Y$:
 $$\text{Var}(X + Y) = \text{Var}(X) + \text{Var}(Y) + 2 \cdot \text{Cov}(X, Y)$$
 
@@ -176,14 +175,12 @@ $$\text{Var}(X + Y + Z) = \text{Var}(X) + \text{Var}(Y) + \text{Var}(Z) + 2 \cdo
 
 **Observación Clave**: La varianza de la suma de variables aleatorias no es simplemente la suma de las varianzas individuales. Es necesario incorporar la covarianza entre cada par de variables, lo que captura cómo se mueven conjuntamente los activos.
 
-**Extensión a Carteras de n Activos**
-
 En una cartera compuesta por $n$ activos, la varianza total se calcula considerando:
 - Las varianzas individuales de cada activo
 - Las covarianzas entre todos los pares de activos
 - Los pesos de cada activo en la cartera
 
-Este cálculo se realiza eficientemente mediante la siguiente fórmula matricial:
+Este cálculo se realiza mediante la siguiente fórmula matricial:
 
 $$
 \sigma_p^2 =
@@ -328,13 +325,13 @@ print(f'📉 Volatilidad anualizada EWMA: {ewma_vol_annualized:.2%}')
 
 ##### **EWMA para Cartera Multi-Activo**
 
->**Definición:** En el caso de una cartera multi-activo, hay que ajustar la matriz de covarianza utilizando el método EWMA.
+>**Definición:** Matriz varianza-covarianza ajustada.
 
-Por lo tanto, la volatilidad de la cartera ajustada por EWMA se calcula como:
+La volatilidad de la cartera con EWMA se calcula de la siguiente manera:
 
 $$\sigma_p = \sqrt{w^T \Sigma_{ewma} w}$$
 
-La matriz de covarianza EWMA se calcula de la siguiente manera:
+La diferencia con el método tradicional es que la matriz de covarianza es la que se ajusta utilizando el método EWMA:
 
 $$\Sigma_{ewma} = \lambda \Sigma_{t-1} + (1 - \lambda) r_{t-1} r_{t-1}^T$$
 
@@ -398,18 +395,43 @@ Si el VaR mensual al 95% es 2%, significa que la peor pérdida esperada en un me
 
 #### **2.1 Método Paramétrico**
 
-> **Supuesto**: Rendimientos siguen distribución normal  
-> **Ventaja**: Cálculo rápido y eficiente  
-> **Limitación**: Subestima riesgo de colas pesadas
+> **Método**: Basado en distribución normal  
 
-##### **VaR Paramétrico - Activo Individual**
+**Características Principales**:
 
-**Fórmula**: $\text{VaR} = \mu + z_\alpha \cdot \sigma$  
+- **Basado en distribución normal**: Asume que los rendimientos siguen una distribución gaussiana
+- **Cálculo algebraico**: Utiliza fórmulas matemáticas cerradas en lugar de simulaciones
+- **Parámetros clave**: Requiere únicamente la media (μ) y desviación estándar (σ) de los rendimientos
+- **Eficiencia computacional**: Cálculo rápido y directo mediante fórmulas estadísticas
+- **Nivel de confianza**: Típicamente se utilizan niveles de 95% o 99%
+
+**Ventajas método paramétrico**
+
+- **Simplicidad**: Fácil de implementar y comprender conceptualmente
+- **Velocidad**: Cálculo instantáneo sin necesidad de simulaciones iterativas
+- **Requerimientos de datos**: Necesita menos datos históricos comparado con métodos no paramétricos
+- **Interpretación directa**: Relación clara entre volatilidad y riesgo
+- **Transparencia**: Los supuestos y cálculos son completamente visibles y auditables
+
+**Limitaciones método paramétrico**
+
+- **Supuesto de normalidad**: Los mercados financieros presentan colas pesadas (fat tails) y asimetría que la distribución normal no captura
+- **Eventos extremos**: Subestima la probabilidad de pérdidas severas (cisnes negros)
+- **Linealidad**: Asume relaciones lineales entre factores de riesgo y valores de cartera
+- **No captura curtosis**: Ignora el exceso de curtosis presente en series financieras
+- **Correlaciones estáticas**: No considera cambios en las correlaciones durante períodos de estrés
+- **Inadecuado para derivados**: No es apropiado para instrumentos con perfiles de riesgo no lineales.
+
+El VaR paramétrico asume que los rendimientos de los activos financieros siguen una distribución normal. Bajo esta suposición, el VaR se calcula utilizando la media y la desviación estándar de los rendimientos.
+
+$$\text{VaR} = \mu + z_\alpha \cdot \sigma$$
 
 Donde: 
 -   $\mu$: Retorno medio.
 -   $z_\alpha$: Estadistico Z correspondiente a 1 - nivel de confianza 
 -   $\sigma$: Desviación estándar.
+
+**VaR Paramétrico - Activo Individual**
 
 A continuación, se muestra un ejemplo de cómo calcular el VaR paramétrico para un activo individual utilizando Python:
 
@@ -437,13 +459,13 @@ print(f'📉 VaR paramétrico al 95%: {var_parametric_monthly:.2%}')
 ```
 
 **Output esperado**:
-```
+``
 📊 VaR Paramétrico Mensualizado (95% confianza): -7.35%
-```
+``
 
 ##### **VaR Paramétrico - Cartera Multi-Activo**
 
-> **Método**: Utiliza volatilidad de cartera calculada mediante matriz de varianza-covarianza.
+> **Método**: Matriz de varianza-covarianza.
 
 Para el cálculo del VaR paramétrico de una cartera multi-activo, se utiliza la misma fórmula que para un activo individual, pero reemplazando la volatilidad del activo por la volatilidad de la cartera.
 
@@ -490,8 +512,7 @@ En ambos ejercicios anteriores, se puede ajustar el cálculo ultilizando EWMA, e
 #### **2.2 Método Histórico**
 
 > **Método**: Estimación basada en rendimientos históricos ordenados
-> **Ventaja**: No requiere supuestos sobre la distribución de los datos
-> **Limitación**: Dependiente de la calidad y extensión del histórico disponible
+
 
 El VaR histórico es uno de los métodos más intuitivos para estimar el riesgo de mercado, ya que utiliza directamente los datos observados sin hacer supuestos paramétricos sobre la distribución de los rendimientos.
 
@@ -513,20 +534,6 @@ El VaR histórico es uno de los métodos más intuitivos para estimar el riesgo 
 3. **Eventos no observados**: No puede capturar eventos que no hayan ocurrido en el período histórico
 4. **Requiere datos extensos**: Necesita un historial suficiente para estimaciones confiables (típicamente 250+ observaciones)
 5. **Ventana temporal**: Puede ser menos reactivo a cambios recientes en la volatilidad del mercado
-
-
-
-**Consideraciones Prácticas**:
-- **Tamaño de muestra**: Para VaR al 95%, se recomienda mínimo 250 observaciones (aproximadamente 1 año de datos diarios)
-- **Para VaR al 99%**: Se requieren al menos 500 observaciones (aproximadamente 2 años)
-- **Actualización**: Es recomendable recalcular periódicamente utilizando ventanas móviles de datos
-- **Backtesting**: Validar que el número de excepciones (días donde la pérdida excede el VaR) sea consistente con el nivel de confianza
-
-**Interpretación del Resultado**:
-Si el VaR histórico mensualizado al 95% es -7.19%, significa que:
-- Con 95% de confianza, la pérdida en un mes no debería exceder el 7.19%
-- Históricamente, solo el 5% de los períodos mensuales tuvieron pérdidas superiores a 7.19%
-- Existe un 5% de probabilidad de experimentar pérdidas mayores a este valor
 
 
 ##### **VaR Histórico - Activo Individual**
@@ -581,7 +588,8 @@ print(f'📈 VaR histórico mensualizado de la cartera (95%): {var_historical_po
 #### **2.3 Método Simulación de Monte Carlo**
 El VaR mediante simulación de Monte Carlo implica generar múltiples escenarios de rendimientos futuros. Para lo anterior, simulamos muchos futuros posibles usando un modelo matemático de cómo se mueven los precios: el Browniano Geométrico (GBM).
 
-##### **Movimiento Browniano Geométrico**
+**Movimiento Browniano Geométrico**
+
 El GBM es un modelo simple y popular en finanzas. Supone tres cosas clave:
 
 1. Los retornos logarítmicos son normales
@@ -677,7 +685,7 @@ plt.show()
 
 Al considerar una cartera de varios activos, hay que tener presente que los activos no se mueven de forma independiente, algunos suben juntos, otros se mueven en sentido contrario.
 
-Para que las simulaciones sean realistas necesitamos que los shocks aleatorios $(\mu)$ de los activos estén correlacionados. Para lo anterior se utiliza la descomposición de Cholesky de la matriz de correlación de los activos, a partir de esta, se obtiene la matriz triangular inferior, la cual es la que se utliza para correlacionar los shocks aleatorios generados.
+Para que las simulaciones sean realistas necesitamos que los shocks aleatorios $(z)$ de los activos estén correlacionados. Para lo anterior se utiliza la descomposición de Cholesky de la matriz de correlación de los activos, a partir de esta, se obtiene la matriz triangular inferior, la cual es la que se utliza para correlacionar los shocks aleatorios generados.
 
 ##### **Descomposición de Cholesky**
 Imaginemos un portafolio de tres activos, del cual se puede calcular una matriz de correlación como la siguiente:
