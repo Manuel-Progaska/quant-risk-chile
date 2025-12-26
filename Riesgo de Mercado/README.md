@@ -112,12 +112,29 @@ import matplotlib.pyplot as plt  # Visualización de datos
 ---
 
 ### **1. Cálculo de Volatilidad**
+Se calcula como la desviación estándar de los rendimientos históricos y representa el grado de variabilidad o incertidumbre en los retornos esperados.
 
-La **volatilidad** se implementa como la desviación estándar de los rendimientos históricos, anualizada mediante el factor $\sqrt{252}$ para datos diarios.
+**Interpretación Práctica:**
+- Mayor volatilidad → Mayor riesgo → Fluctuaciones de precio más amplias
+- Menor volatilidad → Menor riesgo → Movimientos de precio más estables
+
 
 #### **1.1 Volatilidad de Activo Individual**
 
-> **Método**: Desviación estándar de rendimientos históricos anualizada
+> **Método**: Desviación estándar de rendimientos históricos
+
+El estimador por excelencia de la volatilidad es la desviación estándar de los retornos históricos.
+
+La fórmula de la desviación estándar es:
+$$\sigma = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (r_i - \bar{r})^2}$$
+
+Donde:
+- $\sigma$: Desviación estándar (volatilidad)
+- $N$: Número de observaciones
+- $r_i$: Retorno en el período i
+- $\bar{r}$: Retorno promedio
+
+A continuación, se muestra un ejemplo de cómo calcular la volatilidad de un activo individual utilizando Python:
 
 ```python
 import numpy as np
@@ -131,24 +148,78 @@ days = 252 * 3
 returns = np.random.normal(0, 0.01, days)
 returns_series = pd.Series(returns, name='RETORNS_DIARIOS')
 
-# Cálculo de volatilidad anualizada
+# Cálculo de desviación estándar utlilizando pandas
 volatility = returns_series.std() * np.sqrt(252)
 print(f'📊 Volatilidad anualizada: {volatility:.2%}')
 ```
-
 **Output esperado**: `📊 Volatilidad anualizada: 15.69%`
+
+Como se ve en el ejemplo anterior, la volatilidad calculada con retornos diarios se puede anualizar multiplicándola por la raíz cuadrada del número de períodos en un año (252 días para datos diarios).
+
+Lo anterior se explica porque la varianza de los retornos se escala linealmente con el tiempo, y la desviación estándar (volatilidad), al ser la raiz cuadrada de la varianza, se escala con la raíz cuadrada del tiempo.
+
+Esta característica de la forma de escalar la desviación estandar, se aplica en otras métricas que involucran volatilidad, como el Value at Risk (VaR) y el Tracking Error.
 
 #### **1.2 Volatilidad de Cartera Multi-Activo**
 
->**Método**: Matriz de varianza-covarianza con pesos de cartera  
->**Fórmula**: $\sigma_p = \sqrt{w^T \Sigma w}$
+> **Método**: Matriz de varianza-covarianza
+
+Para obtener la desviación estándar de la cartera, primero es necesario calcular su varianza total. Para comprender este cálculo, es fundamental entender la propiedad de la suma de varianzas.
+
+**Propiedad de la Suma de Varianzas**
+
+Para dos variables aleatorias $X$ y $Y$:
+$$\text{Var}(X + Y) = \text{Var}(X) + \text{Var}(Y) + 2 \cdot \text{Cov}(X, Y)$$
+
+Para tres variables aleatorias $X$, $Y$ y $Z$:
+$$\text{Var}(X + Y + Z) = \text{Var}(X) + \text{Var}(Y) + \text{Var}(Z) + 2 \cdot \text{Cov}(X, Y) + 2 \cdot \text{Cov}(X, Z) + 2 \cdot \text{Cov}(Y, Z)$$
+
+**Observación Clave**: La varianza de la suma de variables aleatorias no es simplemente la suma de las varianzas individuales. Es necesario incorporar la covarianza entre cada par de variables, lo que captura cómo se mueven conjuntamente los activos.
+
+**Extensión a Carteras de n Activos**
+
+En una cartera compuesta por $n$ activos, la varianza total se calcula considerando:
+- Las varianzas individuales de cada activo
+- Las covarianzas entre todos los pares de activos
+- Los pesos de cada activo en la cartera
+
+Este cálculo se realiza eficientemente mediante la siguiente fórmula matricial:
+
+$$
+\sigma_p^2 =
+\begin{bmatrix}
+w_a & w_b & w_c & \dots & w_n
+\end{bmatrix}  
+\cdot
+\begin{bmatrix}
+var_a & cov_{a,b} & cov_{a,c} & \dots & cov_{a,n}\\
+cov_{b,a} & var_b & cov_{b,c}  & \dots & cov_{b,n} \\
+cov_{c,a} & cov_{c,b} & var_c  & \dots & cov_{c,n} \\
+\vdots & \vdots & \vdots  & \dots &  \vdots \\
+cov_{n,a} & cov_{n,b} & cov_{n,c}  & \dots & cov_{n,n}
+\end{bmatrix}
+\cdot
+\begin{bmatrix}
+w_a \\
+w_b \\
+w_c \\
+\vdots \\
+w_n
+\end{bmatrix}
+$$
+
+Lo anterior se puede resumir de la siguiente manera:
+
+$$\sigma_p^2 = w^T \cdot \Sigma \cdot w$$
 
 Donde:
-- $\sigma_p$: Volatilidad de la cartera
+
+- $\sigma_p^2$: Varianza de la cartera
 - $w$: Vector de pesos de la cartera
 - $w^T$: Vector de pesos de la cartera transpuesto.
 - $\Sigma$: Matriz de varianza-covarianza de los activos
 
+A continuación, se muestra un ejemplo de cómo calcular la volatilidad de una cartera multi-activo utilizando Python:
 
 ```python
 import numpy as np
@@ -183,7 +254,27 @@ print(f'📈 Volatilidad anual de la cartera: {portfolio_volatility_annualized:.
 
 #### **1.3 Método EWMA (Exponentially Weighted Moving Average)**
 
-> **Definición**: Modelo que asigna mayor peso a los datos más recientes para estimar la volatilidad, utilizando un factor de decaimiento $\lambda$.
+>**Definición**: Modelo que asigna mayor peso a los datos más recientes para estimar la volatilidad, utilizando un factor de decaimiento $\lambda$.
+
+**Ventajas del Método EWMA**:
+- **Adaptabilidad**: Se ajusta más rápidamente a cambios recientes en la volatilidad del mercado
+- **Ponderación temporal**: Otorga mayor importancia a observaciones recientes, reflejando mejor la dinámica actual
+- **Suavizado**: Reduce el ruido de fluctuaciones aleatorias mientras captura tendencias persistentes
+
+**Limitaciones**:
+- **Sensibilidad al parámetro λ**: La elección del factor de decaimiento es crítica y puede variar según el activo
+- **Valores típicos**: En la práctica, RiskMetrics recomienda λ = 0.94 para datos diarios y λ = 0.97 para datos mensuales
+- **Dependencia del histórico**: Requiere un valor inicial de varianza que puede afectar los primeros cálculos
+
+**Comparación EWMA vs Volatilidad Tradicional**:
+
+| Aspecto | Volatilidad Tradicional | EWMA |
+|---------|------------------------|------|
+| **Ponderación** | Igual peso para todas las observaciones | Mayor peso a datos recientes |
+| **Respuesta** | Lenta ante cambios de mercado | Rápida adaptación |
+| **Ventana temporal** | Fija (ej: 252 días) | Decaimiento exponencial |
+| **Uso recomendado** | Análisis histórico estable | Gestión de riesgo dinámica |
+
 
 **Fórmula**: $\sigma_t^2 = \lambda \sigma_{t-1}^2 + (1 - \lambda) r_{t-1}^2$
 
@@ -196,6 +287,8 @@ Donde:
 
 
 ##### **EWMA para Activo Individual**
+
+A continuación, se muestra un ejemplo con python de cómo calcular la volatilidad utilizando el método EWMA para un activo individual:
 
 ```python
 import numpy as np
@@ -249,6 +342,8 @@ Donde:
 - $\lambda$: Factor de decaimiento (0 < λ < 1)
 - $\Sigma_{t-1}$: Matriz de covarianza en el tiempo t-1
 - $r_{t-1} r_{t-1}^T$: Es la matriz de varianzas y covarianzas instantánea del día t−1.
+
+A continuación, se muestra un ejemplo con python de cómo calcular la volatilidad utilizando el método EWMA para una cartera multi-activo:
 
 ```python
 import numpy as np
@@ -309,8 +404,14 @@ Si el VaR mensual al 95% es 2%, significa que la peor pérdida esperada en un me
 
 ##### **VaR Paramétrico - Activo Individual**
 
-> **Fórmula**: $\text{VaR} = \mu + z_\alpha \cdot \sigma$  
-> **Donde**: $z_\alpha$ es el estadistico Z correspondiente a 1 - nivel de confianzade, $\mu$ es el retorno medio, y $\sigma$ es la desviación estándar.
+**Fórmula**: $\text{VaR} = \mu + z_\alpha \cdot \sigma$  
+
+Donde: 
+-   $\mu$: Retorno medio.
+-   $z_\alpha$: Estadistico Z correspondiente a 1 - nivel de confianza 
+-   $\sigma$: Desviación estándar.
+
+A continuación, se muestra un ejemplo de cómo calcular el VaR paramétrico para un activo individual utilizando Python:
 
 ```python
 import numpy as np
@@ -343,6 +444,10 @@ print(f'📉 VaR paramétrico al 95%: {var_parametric_monthly:.2%}')
 ##### **VaR Paramétrico - Cartera Multi-Activo**
 
 > **Método**: Utiliza volatilidad de cartera calculada mediante matriz de varianza-covarianza.
+
+Para el cálculo del VaR paramétrico de una cartera multi-activo, se utiliza la misma fórmula que para un activo individual, pero reemplazando la volatilidad del activo por la volatilidad de la cartera.
+
+A continuación, se muestra un ejemplo de cómo calcular el VaR paramétrico para una cartera multi-activo utilizando Python:  
 
 ```python
 import numpy as np
@@ -383,7 +488,46 @@ print(f'📉 VaR paramétrico Mensualizado de la cartera al 95%: {var_parametric
 En ambos ejercicios anteriores, se puede ajustar el cálculo ultilizando EWMA, en el caso de un activo individual, se utiliza la volatilidad EWMA en lugar de la desviación estándar tradicional. Para una cartera multi-activo, se utiliza la matriz de covarianza EWMA.
 
 #### **2.2 Método Histórico**
-El VaR histórico se basa en datos históricos de rendimientos para estimar la pérdida máxima potencial. El VaR se calcula ordenando los rendimientos y seleccionando el percentil correspondiente al nivel de confianza deseado.
+
+> **Método**: Estimación basada en rendimientos históricos ordenados
+> **Ventaja**: No requiere supuestos sobre la distribución de los datos
+> **Limitación**: Dependiente de la calidad y extensión del histórico disponible
+
+El VaR histórico es uno de los métodos más intuitivos para estimar el riesgo de mercado, ya que utiliza directamente los datos observados sin hacer supuestos paramétricos sobre la distribución de los rendimientos.
+
+**Características Principales**:
+- **Simplicidad conceptual**: Se basa únicamente en datos históricos reales
+- **No paramétrico**: No asume ninguna distribución estadística específica (como normalidad)
+- **Transparencia**: Fácil de explicar y entender para stakeholders no técnicos
+- **Captura eventos extremos**: Incluye automáticamente crisis y eventos históricos significativos
+
+**Ventajas del Método Histórico**:
+1. **Refleja la realidad**: Utiliza datos reales del mercado, capturando comportamientos complejos
+2. **Captura asimetría y curtosis**: No se ve limitado por supuestos de distribución normal
+3. **Implementación sencilla**: Requiere solo ordenar los datos y seleccionar un percentil
+4. **Incorpora correlaciones naturales**: En carteras, las correlaciones históricas están implícitas
+
+**Limitaciones del Método Histórico**:
+1. **Dependencia del período**: Los resultados pueden variar significativamente según el período histórico seleccionado
+2. **Supuesto de estacionariedad**: Asume que el futuro se comportará como el pasado
+3. **Eventos no observados**: No puede capturar eventos que no hayan ocurrido en el período histórico
+4. **Requiere datos extensos**: Necesita un historial suficiente para estimaciones confiables (típicamente 250+ observaciones)
+5. **Ventana temporal**: Puede ser menos reactivo a cambios recientes en la volatilidad del mercado
+
+
+
+**Consideraciones Prácticas**:
+- **Tamaño de muestra**: Para VaR al 95%, se recomienda mínimo 250 observaciones (aproximadamente 1 año de datos diarios)
+- **Para VaR al 99%**: Se requieren al menos 500 observaciones (aproximadamente 2 años)
+- **Actualización**: Es recomendable recalcular periódicamente utilizando ventanas móviles de datos
+- **Backtesting**: Validar que el número de excepciones (días donde la pérdida excede el VaR) sea consistente con el nivel de confianza
+
+**Interpretación del Resultado**:
+Si el VaR histórico mensualizado al 95% es -7.19%, significa que:
+- Con 95% de confianza, la pérdida en un mes no debería exceder el 7.19%
+- Históricamente, solo el 5% de los períodos mensuales tuvieron pérdidas superiores a 7.19%
+- Existe un 5% de probabilidad de experimentar pérdidas mayores a este valor
+
 
 ##### **VaR Histórico - Activo Individual**
 ```python
@@ -662,17 +806,53 @@ plt.show()
 ```
 ![simulacion_var_cartera](images/monte_carlo_portfolio_var_distribution.png)
 
+<br>
+
+**Comparación con Otros Métodos de VaR**:
+
+| Aspecto | VaR Histórico | VaR Paramétrico | VaR Monte Carlo |
+|---------|--------------|-----------------|-----------------|
+| **Supuestos** | Ninguno | Normalidad | Modelo estocástico |
+| **Cálculo** | Simple | Muy rápido | Computacionalmente intensivo |
+| **Colas pesadas** | Captura si existen | Subestima | Depende del modelo |
+| **Datos requeridos** | Muchos | Moderados | Moderados + modelo |
+| **Flexibilidad** | Baja | Baja | Alta |
+
+<br>
+
+---
 
 ### **3. Cálculo Tracking Error**
+El Tracking Error mide la desviación estándar de las diferencias entre los rendimientos de una cartera y su índice de referencia (benchmark). Existen dos tipos principales de Tracking Error: Expost y Exante.
 
 #### **3.1 Tracking Error Expost**
-El Tracking Error Expost mide la desviación estándar de las diferencias entre los rendimientos de una cartera y su índice de referencia durante un período pasado. A continuación, se muestra un ejemplo de cómo calcular el Tracking Error Expost utilizando Python:   
+>**Método**: Basado en datos históricos de rendimientos pasados
+
+El Tracking Error Expost mide la desviación estándar de las diferencias entre los rendimientos de una cartera y su índice de referencia durante un período pasado.
+
+**Fórmula del Tracking Error Expost**:
+
+$$TE_{expost} = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (R_{p,i} - R_{b,i} - \overline{R_{p} - R_{b}})^2}$$
+
+Donde:
+- $TE_{expost}$: Tracking Error Ex-post
+- $N$: Número de observaciones (períodos)
+- $R_{p,i}$: Rendimiento de la cartera en el período $i$
+- $R_{b,i}$: Rendimiento del benchmark en el período $i$
+- $(R_{p,i} - R_{b,i})$: Diferencia de rendimiento en el período $i$
+- $\overline{R_{p} - R_{b}}$: Media de las diferencias de rendimiento
+
+**Interpretación**: Un Tracking Error Expost del 3% anualizado significa que históricamente la cartera se ha desviado en promedio un 3% por año respecto al benchmark.
+
+**Ejemplo de cálculo paso a paso**:
 
 ```python
 import numpy as np  
 import pandas as pd
 
 # Simular rendimientos de 4 activos y su benchmark
+np.random.seed(42)
+days = 252 * 3
 num_assets = 4  
 returns_matrix = np.random.normal(0, 0.01, (days, num_assets))
 returns_df = pd.DataFrame(returns_matrix, columns=[f'Asset_{i+1}' for i in range(num_assets)])  
@@ -682,45 +862,101 @@ benchmark_returns_series = pd.Series(benchmark_returns)
 # Pesos de la cartera
 weights = np.array([0.25, 0.25, 0.25, 0.25])
 
-# Calcular los rendimientos de la cartera
+# Paso 1: Calcular los rendimientos de la cartera
 portfolio_returns = returns_df.dot(weights) 
 
-# Calcular las diferencias de rendimiento
+# Paso 2: Calcular las diferencias de rendimiento (R_p - R_b)
 return_differences = portfolio_returns - benchmark_returns_series   
 
-# Calcular el Tracking Error Expost de la cartera
-tracking_error_expost_portfolio = return_differences.std() * np.sqrt(252)
+# Paso 3: Calcular la desviación estándar de las diferencias
+tracking_error_daily = return_differences.std()
+
+# Paso 4: Anualizar el Tracking Error (multiplicar por √252)
+tracking_error_expost_portfolio = tracking_error_daily * np.sqrt(252)
+
+print(f'📏 Tracking Error Ex-post (diario): {tracking_error_daily:.4%}')
 print(f'📏 Tracking Error Ex-post (anualizado): {tracking_error_expost_portfolio:.2%}')
 ```
-
 **Output esperado**: `📏 Tracking Error Ex-post (anualizado): 3.15%`
 
+
 #### **3.2 Tracking Error Exante**
-El Tracking Error Exante estima la desviación estándar de las diferencias entre los rendimientos esperados de una cartera y su índice de referencia utilizando la matriz de covarianza de los activos en la cartera. A continuación, se muestra un ejemplo de cómo calcular el Tracking Error Exante utilizando Python:
+>**Método**: Basado en la matriz de covarianza de los activos en la cartera
+
+El Tracking Error Exante estima la desviación estándar de las diferencias entre los rendimientos esperados de una cartera y su índice de referencia utilizando la matriz de covarianza de los activos en la cartera. 
+
+El Tracking Error Ex-ante se calcula mediante la expresión matricial:
+
+$$TE_{exante} = \sqrt{(w_p - w_b)^T \cdot \Sigma \cdot (w_p - w_b)}$$
+
+Donde:
+- $(w_p)$: Vector de pesos de la cartera activa
+- $(w_b)$: Vector de pesos del benchmark
+- $(w_p - w_b)$: Vector de pesos activos (active weights)
+- $(\Sigma)$: Matriz de covarianza de los retornos de los activos
+
+**Descomposición del Cálculo**:
+
+1. **Pesos Activos**: La diferencia $(w_p - w_b)$ representa cuánto se desvía cada posición de la cartera respecto al benchmark
+2. **Contribución de Covarianza**: El producto $(w_p - w_b)^T \cdot \Sigma \cdot (w_p - w_b)$ captura:
+    - La varianza de cada posición activa
+    - Las covarianzas entre todas las posiciones activas
+3. **Raíz Cuadrada**: Transforma la varianza en desviación estándar (volatilidad)
+
 
 ```python
 import numpy as np
 import pandas as pd
 
 # Simular rendimientos de 4 activos
+np.random.seed(42)
+days = 252 * 3
 num_assets = 4
 returns_matrix = np.random.normal(0, 0.01, (days, num_assets))
 returns_df = pd.DataFrame(returns_matrix, columns=[f'Asset_{i+1}' for i in range(num_assets)])
 
-# Pesos de la cartera
-weights = np.array([0.25, 0.25, 0.25, 0.25])
+# Simular pesos del benchmark (índice de referencia)
+benchmark_weights = np.array([0.30, 0.30, 0.25, 0.15])
 
-# Calcular la matriz de covarianza
+# Pesos de la cartera activa
+portfolio_weights = np.array([0.25, 0.25, 0.25, 0.25])
+
+# Calcular el vector de diferencias de pesos activos (Active Weights)
+active_weights = portfolio_weights - benchmark_weights
+
+# Calcular la matriz de covarianza de los activos
 cov_matrix = returns_df.cov()
 
-# Calcular el Tracking Error Exante de la cartera
+# Fórmula del Tracking Error Ex-ante:
+# TE = √(w_active^T × Σ × w_active)
+# Donde:
+# - w_active: Vector de pesos activos (diferencia entre cartera y benchmark)
+# - Σ: Matriz de covarianza de los retornos de los activos
+# - El resultado es la desviación estándar de los retornos activos
 
-tracking_error_exante_portfolio = np.sqrt(np.dot(weights.T, np.dot(cov_matrix.values, weights))) * np.sqrt(252)
-print(f'📏 Tracking Error Ex-ante (anualizado): {tracking_error_exante_portfolio:.2%}')
+tracking_error_exante = np.sqrt(np.dot(active_weights.T, np.dot(cov_matrix.values, active_weights)))
+
+# Anualizar el Tracking Error (multiplicar por √252 para datos diarios)
+tracking_error_exante_annualized = tracking_error_exante * np.sqrt(252)
+
+print(f'📏 Tracking Error Ex-ante (anualizado): {tracking_error_exante_annualized:.2%}')
 ```
 
-**Output esperado**: `📏 Tracking Error Ex-ante (anualizado): 7.94%`
+**Output esperado**: `📏 Tracking Error Ex-ante (anualizado): 2.36%`
 
+**Diferencias Clave entre Ex-ante y Ex-post**:
+
+| Aspecto | Ex-post | Ex-ante |
+|---------|---------|---------|
+| **Base** | Retornos históricos realizados | Matriz de covarianza prospectiva |
+| **Fórmula** | $TE = \sigma(R_p - R_b)$ | $TE = \sqrt{w_{activo}^T \Sigma w_{activo}}$ |
+| **Uso** | Evaluación de desempeño pasado | Gestión de riesgo prospectiva |
+| **Ventaja** | Refleja realidad histórica | Estimación adelantada del riesgo |
+| **Limitación** | Backward-looking | Depende de supuestos de covarianza |
+
+<br>
+
+---
 
 ### **4. Cálculo Beta de Mercado**
 El beta de mercado se calcula mediante la regresión lineal de los rendimientos de un activo o cartera contra los rendimientos del mercado, por métdo de los mínimos cuadrados ordinarios (OLS). A continuación, se muestra un ejemplo de cómo calcular el beta de mercado utilizando Python:
