@@ -629,53 +629,62 @@ A continuación, se muestra un ejemplo de cómo implementar la simulación de Mo
 ```python
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
-# Simular rendimientos de un activo financiero
 np.random.seed(42)
-days = 252 * 3  # 3 años de datos diarios
-returns = np.random.normal(0, 0.01, days)  # Rendimientos
-returns_series = pd.Series(returns) 
 
-# Parámetros del activo
-S0 = 100  # Precio inicial
+# === Datos simulados (3 años diarios)
+days = 252 * 3
 
-# Retorno anualizado
-mu = returns_series.mean() * 252  
+# Simulación de retornos diarios del activo
+returns = np.random.normal(0, 0.01, days)
+returns_df = pd.Series(returns, name='Asset')
 
-# Volatilidad anualizada   
-sigma = returns_series.std() * np.sqrt(252)  
+# Log-retornos (aprox iguales para retornos pequeños)
+log_returns = returns_df.copy()
 
-# Simulación de Monte Carlo
-num_simulations = 10000
-time_horizon = 1  # 1 año
-simulated_prices = []   
-for i in range(num_simulations):
-    Z = np.random.normal()
-    S1 = S0 * np.exp((mu - 0.5 * sigma**2) * time_horizon + sigma * np.sqrt(time_horizon) * Z)
-    simulated_prices.append(S1)
-simulated_prices = np.array(simulated_prices)
+# === Parámetros diarios ===
+mu = log_returns.mean()       # drift diario
+sigma = log_returns.std()     # volatilidad diaria
 
-# Calcular los rendimientos simulados
-simulated_returns = (simulated_prices - S0) / S0
+# === Simulación Monte Carlo GBM ===
+n_sim = 1_000_000
+n_days = 21
+dt = 1
 
-# Parámetros del VaR
+# Shocks normales
+Z = np.random.normal(size=(n_sim, n_days))
+
+# Log-retornos simulados
+log_returns_sim = (
+    (mu - 0.5 * sigma**2) * dt
+    + sigma * np.sqrt(dt) * Z
+)
+
+# Acumulación mensual
+log_return_month = log_returns_sim.sum(axis=1)
+
+# Retornos simples mensuales
+monthly_returns = np.exp(log_return_month) - 1
+
+# === VaR Monte Carlo mensual 95% ===
 confidence_level = 0.95
+VaR_MC_monthly = -np.percentile(
+    monthly_returns,
+    (1 - confidence_level) * 100
+)
 
-# Calcular el VaR mediante simulación de Monte Carlo anualizado
-var_monte_carlo = np.percentile(simulated_returns, (1 - confidence_level) * 100)
-print(f'🎲 VaR Monte Carlo anualizado (95%): {var_monte_carlo:.2%}')
 ```
 
 Si queremos graficar las simulaciones de precios futuros, podemos agregar el siguiente código al final del bloque anterior:
 
 ```python
-# histograma de los rendimientos simulados
-plt.hist(simulated_returns, bins=300, alpha=0.7, color='blue')
-plt.title(f'{num_simulations:,} Rendimientos Simulados - Monte Carlo: {var_monte_carlo:.2%} Anual')
-plt.xlabel('Rendimiento')
+# graficar simulación
+import matplotlib.pyplot as plt
+plt.hist(monthly_returns, bins=150, alpha=0.7, color='blue')
+plt.title(f'{n_sim:,} Simulaciones de Retornos Mensuales del Portafolio - VaR: {VaR_MC_monthly:.2%} Mensual')
+plt.xlabel('Rendimiento Mensual')
 plt.ylabel('Frecuencia')
-plt.axvline(var_monte_carlo, color='red', linestyle='dashed', linewidth=2, label='VaR 95%')
+plt.axvline(VaR_MC_monthly, color='red', linestyle='dashed', linewidth=2, label='VaR 95%')
 plt.legend()
 # guardar y mostrar el gráfico
 plt.savefig(r'images/monte_carlo_var_distribution.png')
@@ -761,52 +770,71 @@ A continuación, se muestra un ejemplo de cómo implementar la simulación de Mo
 import numpy as np
 import pandas as pd
 
-# Simular rendimientos de 4 activos
+np.random.seed(42)
+
+# Datos simulados (3 años diarios)
+days = 252 * 3
 num_assets = 4
+
 returns_matrix = np.random.normal(0, 0.01, (days, num_assets))
-returns_df = pd.DataFrame(returns_matrix, columns=[f'Asset_{i+1}' for i in range(num_assets)])
+returns_df = pd.DataFrame(
+    returns_matrix,
+    columns=[f'Asset_{i+1}' for i in range(num_assets)]
+)
 
-# Pesos de la cartera
-weights = np.array([0.25, 0.25, 0.25, 0.25]) 
+# Log-retornos (aprox iguales para retornos pequeños)
+log_returns = returns_df.copy()
 
-# Parámetros de los activos
-S0 = np.array([100, 150, 200, 250])  
-mu = returns_df.mean() * 252  
-sigma = returns_df.std() * np.sqrt(252)
 
-# Matriz de correlación y descomposición de Cholesky
-correlation_matrix = returns_df.corr()
-L = np.linalg.cholesky(correlation_matrix)
+# Parámetros diarios
+mu = log_returns.mean().values               # drift diario
+cov = log_returns.cov().values               # covarianza diaria
+sigma = np.sqrt(np.diag(cov))                # volatilidades
+corr = np.corrcoef(log_returns.T)            # correlación
+chol = np.linalg.cholesky(corr)              # Cholesky
 
-# Simulación de Monte Carlo con Cholesky
-num_simulations = 100_000
-time_horizon = 1  # 1 año
-simulated_portfolio_returns = []   
-for i in range(num_simulations):
-    Z_independent = np.random.normal(size=num_assets)
-    # Correlacionar los shocks
-    Z_correlated = L @ Z_independent  
-    S1 = S0 * np.exp((mu - 0.5 * sigma**2) * time_horizon + sigma * np.sqrt(time_horizon) * Z_correlated)   
-    portfolio_return = np.dot(weights, (S1 - S0) / S0)
-    simulated_portfolio_returns.append(portfolio_return)
-simulated_portfolio_returns = np.array(simulated_portfolio_returns)     
 
-# Parámetros del VaR
-confidence_level = 0.95 
+# Portafolio
+weights = np.array([0.25, 0.25, 0.25, 0.25])
 
-# Calcular el VaR mediante simulación de Monte Carlo para la cartera (anualizado)
-var_monte_carlo_portfolio = np.percentile(simulated_portfolio_returns, (1 - confidence_level) * 100)
-print(f'🎲 VaR Monte Carlo anualizado de la cartera (95%): {var_monte_carlo_portfolio:.2%}')
+# Simulación Monte Carlo GBM
+n_sim = 1_000_000
+n_days = 21
+
+# Shocks iid
+Z = np.random.normal(size=(n_sim, n_days, num_assets))
+
+# Introducir correlación
+Z_corr = Z @ chol.T
+
+# GBM diario
+log_returns_sim = (
+    (mu - 0.5 * sigma**2)
+    + Z_corr * sigma
+)
+
+# Acumulación mensual
+log_returns_month = log_returns_sim.sum(axis=1)
+
+# Retornos simples mensuales por activo
+R_month_assets = np.exp(log_returns_month) - 1
+
+# Retorno del portafolio
+R_portfolio = R_month_assets @ weights
+
+# VaR Monte Carlo mensual 95%
+confidence_level = 0.95
+VaR_MC_monthly = np.percentile(R_portfolio, (1 - confidence_level) * 100)
 ```
 Si queremos graficar las simulaciones de rendimientos futuros de la cartera, podemos agregar el siguiente código al final del bloque anterior:
 
 ```python
-# histograma de los rendimientos simulados de la cartera
-plt.hist(simulated_portfolio_returns, bins=300, alpha=0.7, color='green')
-plt.title(f'{num_simulations:,} Rendimientos Simulados de la Cartera - Monte Carlo: {var_monte_carlo_portfolio:.2%} Anual')
-plt.xlabel('Rendimiento de la Cartera')
-plt.ylabel('Frecuencia')        
-plt.axvline(var_monte_carlo_portfolio, color='red', linestyle='dashed', linewidth=2, label='VaR 95%')
+import matplotlib.pyplot as plt
+plt.hist(R_portfolio, bins=150, alpha=0.7, color='green')
+plt.title(f'{n_sim:,} Simulaciones de Retornos Mensuales del Portafolio - VaR: {VaR_MC_monthly:.2%} Mensual')
+plt.xlabel('Rendimiento Mensual')
+plt.ylabel('Frecuencia')
+plt.axvline(VaR_MC_monthly, color='red', linestyle='dashed', linewidth=2, label='VaR 95%')
 plt.legend()
 # guardar y mostrar el gráfico
 plt.savefig(r'images/monte_carlo_portfolio_var_distribution.png')

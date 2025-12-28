@@ -1,0 +1,283 @@
+---
+title: "Finanzas Cuantitativas Chile"
+subtitle: "Reporte de Riesgo de Mercado"
+author: "Manuel Progaska"
+format:
+    pdf:
+        geometry: margin=1in
+        fontsize: 11pt
+        number-sections: False
+        colorlinks: true
+execute:
+    echo: false
+    warning: false
+
+---
+
+Este documento es una muestra de un reporte automatizado con python que incluye la descarga de precios y cálculo de volatilidad y VaR para los siguientes activos: AAPL, TSLA, MSFT, NVDA
+
+```{python}
+import pandas as pd
+import numpy as np
+from datetime import datetime as dt
+from scipy.stats import norm
+import yfinance as yf
+
+# descarga de precios
+tickers : list = ['AAPL', 'TSLA', 'MSFT',  'NVDA']
+df = yf.download(tickers, start='2024-12-01', end='2025-12-01')['Close']
+# cálculo retornos diarios
+df_ret = df.pct_change().dropna()
+df_log_ret = np.log(df / df.shift(1)).dropna()
+```
+
+## Cálculo de métricas por instrumento
+
+
+### Volatilidad
+
+```{python}
+std = df_ret.std()
+df_std = pd.DataFrame(std, columns=['Histórica Anual'])
+df_std = df_std * np.sqrt(252)
+df_std = df_std.map(lambda x: f"{x:.2%}")
+```
+
+```{python}
+# Parámetro de decaimiento
+lambda_ = 0.94
+# filtro por penultima fecha
+date = dt.strftime(df_ret.index[-2], format='%Y-%m-%d')
+df_ret_filtered = df_ret[df_ret.index <= date]
+df_ret_filtered.tail(10)
+lst = []
+for ticker in list(df_ret_filtered.columns):
+    df_aux_ticker = df_ret_filtered[[ticker]]
+    var_0 = df_aux_ticker[ticker].var()
+    ret_0 = df_aux_ticker[ticker].iloc[-1]
+    ewma_var = lambda_ * var_0 + (1 - lambda_) * ret_0**2
+    ewma_vol_annualized = np.sqrt(ewma_var) * np.sqrt(252)
+    df_aux_ewma = pd.DataFrame(
+        {'TICKER': [ticker],
+        'EWMA Anual': [F"{ewma_vol_annualized:.2%}"]}
+    )
+    lst.append(df_aux_ewma)
+df_ewma = pd.concat(lst)
+df_ewma = df_ewma.set_index('TICKER')
+```
+
+
+```{python}
+df_volatilidad = df_std.merge(df_ewma, left_index=True, right_index=True)
+df_volatilidad
+```
+
+
+### Value at Risk (VaR)
+
+```{python}
+confidence = 0.95
+lst = []
+for ticker in list(df_ret.columns):
+    df_aux_ticker = df_ret_filtered[[ticker]] 
+    sigma = df_aux_ticker[ticker].std()
+    mu = df_aux_ticker[ticker].mean()
+    z = norm.ppf(1-confidence)
+    var = mu + sigma*z
+    var = var * np.sqrt(20)
+    df_aux_var = pd.DataFrame(
+        {
+            'TICKER': [ticker],
+            'Paramétrico Mensual 95%': [f"{var:.2%}"]
+        }
+    )
+    lst.append(df_aux_var)
+df_var = pd.concat(lst)
+df_var = df_var.set_index('TICKER')
+```
+
+
+```{python}
+confidence = 0.95
+lst = []
+for ticker in list(df_ret.columns):
+    df_aux_ticker = df_ret[ticker]
+    quartil = df_aux_ticker.quantile(1-confidence) * np.sqrt(20)
+    df_aux_var = pd.DataFrame(
+        {
+            'TICKER': [ticker],
+            'Histórico Mensual 95%': [f"{quartil:.2%}"]
+        }
+    )
+    lst.append(df_aux_var)
+df_var_hist = pd.concat(lst)
+df_var_hist = df_var_hist.set_index('TICKER')
+```
+
+
+```{python}
+n_sim = 1_000_000
+confidence_level = 0.95
+n_paths = 21
+dt = 1
+lst = []
+for ticker in list(df.columns):
+    # media y desviación estandar
+    mu = df_log_ret[ticker].mean()
+    sigma = df_log_ret[ticker].std()
+    S0 = df[ticker].iloc[-1]
+
+    #matriz de shoks aleatorios
+    Z = np.random.normal(size=(n_sim, n_paths))
+
+    # simulación de retornos aleatorios
+    log_returns = (
+        (mu - 0.5 * sigma**2) * dt
+        + sigma * np.sqrt(dt) * Z
+    )
+
+    # Acumulación mensual
+    log_price_paths = np.cumsum(log_returns, axis=1)
+    S_T = S0 * np.exp(log_price_paths[:, -1])
+    monthly_returns = S_T/S0 - 1
+    var_mc = np.percentile(monthly_returns, (1 - confidence_level) * 100)
+    lst.append({
+        'TICKER': ticker,
+        'Monte Carlo Mensual 95%': f"{var_mc:.2%}"
+    })
+df_var_mc = pd.DataFrame(lst).set_index('TICKER')
+```
+
+```{python}
+df_var_95 = df_var.merge(df_var_hist, left_index=True, right_index=True)
+df_var_95 = df_var_95.merge(df_var_mc, left_index=True, right_index=True)
+df_var_95
+```
+\newpage
+
+
+## Cálculo de métricas para un portafolio
+Se genera un portafolio compuesto por 30% AAPL, 20% TSLA, 10% MSFT y 40% NVDA.
+
+### Volatilidad del portafolio
+
+```{python}
+w_port = {
+    'AAPL': 0.3, 'TSLA':0.2, 'MSFT': 0.1, 'NVDA': 0.4
+}
+w_bench = {
+    'AAPL': 0.25, 'TSLA':0.25, 'MSFT': 0.25, 'NVDA': 0.25
+}
+# parametros
+cov_matrix = df_ret[list(w_port.keys())].cov().values
+w = np.array(list(w_port.values()))
+w_t = np.array([list(w_port.values())])
+
+# varianza
+vector_cov = cov_matrix @ w
+varianza = w_t @ vector_cov
+
+# volatilidad
+sigma = np.sqrt(varianza[0])
+sigma_anual =  sigma * np.sqrt(252)
+df_port_sigma = pd.DataFrame(
+    {
+        'PARAMETRO': ['Volatilidad Anual'],
+        'VALOR' : [f"{sigma_anual:.2%}"]
+    }
+)
+
+# === EWMA ===
+lambda_ = 0.94
+# Selección de datos hasta el penúltimo día
+date = df_ret.sort_index(ascending=True).index[-2]
+returns_date = df_ret[df_ret.index <= date]
+
+# Matriz de covarianza inicial
+cov_0 = returns_date.cov().values
+
+# Vector de retornos del último día
+ret_0 = returns_date.iloc[-1].values.reshape(-1, 1)
+
+# Cálculo de matriz de covarianza EWMA
+ewma_cov = lambda_ * cov_0 + (1 - lambda_) * (ret_0 @ ret_0.T)
+
+# varianza
+vector_cov_ewma = ewma_cov @ w
+varianza_ewma = w_t @ vector_cov_ewma
+sigma_anual_ewma = np.sqrt(varianza_ewma[0]) * np.sqrt(252)
+df_port_sigma_ewma = pd.DataFrame(
+    {
+        'PARAMETRO': ['Volatilidad Anual EWMA'],
+        'VALOR' : [f"{sigma_anual_ewma:.2%}"]
+    }
+)
+df_port_sigma = pd.concat([df_port_sigma, df_port_sigma_ewma])
+df_port_sigma = df_port_sigma.set_index('PARAMETRO')
+df_port_sigma
+```
+
+### Value at Risk (VaR) del portafolio
+```{python}
+confidence = 0.95
+
+# === PARAMETRICO ===
+mu1 = w_t @ df_ret.mean().values
+mu1 = mu1[0]
+z1 = norm.ppf(1-confidence)
+var_port_p = mu1 + z1*sigma
+var_port_p = var_port_p * np.sqrt(21)
+
+# === Histórico ===
+ret_port = df_ret @ w
+var_port_h = ret_port.quantile(1-confidence)
+var_port_h = var_port_h * np.sqrt(21)
+
+# === Simulación Monte Carlo ===
+mu_log = df_log_ret.mean().values           # vector (N,)
+sigma_log = df_log_ret.std().values         # vector (N,)
+corr = df_log_ret.corr().values         # matriz NxN
+chol = np.linalg.cholesky(corr)         # Cholesky
+
+n_sim = 1_000_000
+n_days = 21
+dt = 1
+
+# Shocks independientes
+Z = np.random.normal(size=(n_sim, n_days, len(tickers)))
+
+# Correlación
+Z_corr = Z @ chol.T
+
+# Log-retornos simulados diarios
+log_returns_sim = (
+    (mu_log - 0.5 * sigma_log**2) * dt             # drift diario
+    + Z_corr * sigma * np.sqrt(dt)
+)
+
+# Acumulación mensual (log-espacio)
+log_returns_month = log_returns_sim.sum(axis=1)
+
+# Retornos simples mensuales por activo
+R_month_assets = np.exp(log_returns_month) - 1
+
+# Retorno portafolio
+R_portfolio = R_month_assets @ w
+
+var_port_mc = np.percentile(R_portfolio, (1 - confidence) * 100)
+
+df_var_port = pd.DataFrame(
+    {'PARAMETRO': [
+            'VaR Paramétrico 95%', 
+            'VaR Histórico 95%',
+            'VaR Monte Carlo 95%'
+            ],
+    'VALOR': [
+            f"{var_port_p:.2%}", 
+            f"{var_port_h:.2%}", 
+            f"{var_port_mc:.2%}"
+            ]}
+)
+df_var_port = df_var_port.set_index('PARAMETRO')
+df_var_port
+```
