@@ -74,7 +74,9 @@ La idea central del modelo es que no importa solo cuánto rinde un activo ni cu�
 
     La frontera eficiente es el conjunto de todos los portafolios óptimos que ofrecen el máximo retorno esperado para cada nivel de riesgo, o el mínimo riesgo para cada nivel de retorno deseado.
 
-    <img src="images/esquema_frontera_eficiente.png" alt="Frontera Eficiente" width="600">
+    <p align="center">
+        <img src="images/esquema_frontera_eficiente.png" alt="Frontera Eficiente" width="600">
+    </p>
     
     **¿Qué significa?**
     - El eje X es el riesgo (volatilidad) y el eje Y es el retorno esperado
@@ -388,11 +390,13 @@ plt.savefig(r'images/frontera_eficiente.png', dpi=300, bbox_inches='tight')
 
 plt.show()
 ```
-<img src="images/frontera_eficiente.png" alt="Frontera Eficiente" width="600">
+<p align="center">
+    <img src="images/frontera_eficiente.png" alt="Frontera Eficiente" width="600">
+</p>
 
 **Resumen de Resultados:**
 
-- La nuve de puntos representa todos los portafolios posibles con diferentes combinaciones de activos.
+- La nube de puntos representa todos los portafolios posibles con diferentes combinaciones de activos.
 - La línea roja es la frontera eficiente, que muestra los portafolios que ofrecen para nivel de volatilidad el mayor retorno esperado.
 - El portafolio de mínima varianza (estrella azul) es el portafolio con el menor riesgo posible.
 - El portafolio tangente (estrella naranja) es el portafolio que maximiza el ratio de Sharpe, ofreciendo el mejor retorno por unidad de riesgo.
