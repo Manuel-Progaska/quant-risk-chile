@@ -97,10 +97,7 @@ Para encontrar el portafolio de mínima varianza, hay que encontrar la combinaci
 
 $$\text{Minimizar varianza del portfolio }(\sigma_p^2): f(\mathbf{w}) = w^T \Sigma w$$
 
-Sujeto a:
-- $\sum_{i=1}^{n} w_i = 1$ (los pesos suman 100%)
 
-- $w_i \geq 0$ (no se permiten posiciones cortas)
 
 **Consideración:**
 
