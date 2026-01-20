@@ -104,13 +104,13 @@ Sujeto a:
 
 **Consideración:**
 
-> Para resolver el problema de optiminzación, hay que derivar $\sigma_p^2$ respecto a > los pesos $w$:
->
-> $$\frac{\partial}{\partial w_k}  \left( \mathbf{w}^\top \Sigma \mathbf{w} \right) = 2 \sum_{j=1}^{n} \Sigma_{kj} w_j$$
->
-> Como se aprecia en la ecuación anterior, al momento de derivar aparece la cosntante 2. Si bien es cierto que esta constante no afecta el resultado de la minimización, muchas veces se busca evitar que esta aparezca al multiplicar la fuciión por $\frac{1}{2}$. Debido a lo anterior es que muchas veces la función objtetivo aparece escrita de la siguiente forma:
->
-> $$\text{Minimizar: } f(\mathbf{w}) = \frac{1}{2} \mathbf{w}^\top \Sigma \mathbf{w}$$
+Para resolver el problema de optiminzación, hay que derivar $\sigma_p^2$ respecto a > los pesos $w$:
+
+$$\frac{\partial}{\partial w_k}  \left( \mathbf{w}^\top \Sigma \mathbf{w} \right) = 2 \sum_{j=1}^{n} \Sigma_{kj} w_j$$
+
+Como se aprecia en la ecuación anterior, al momento de derivar aparece la cosntante 2. Si bien es cierto que esta constante no afecta el resultado de la minimización, muchas veces se busca evitar que esta aparezca al multiplicar la fuciión por $\frac{1}{2}$. Debido a lo anterior es que muchas veces la función objtetivo aparece escrita de la siguiente forma:
+
+$$\text{Minimizar: } f(\mathbf{w}) = \frac{1}{2} \mathbf{w}^\top \Sigma \mathbf{w}$$
 
 A continuación se muestra un ejemplo de como estimar el portafolio de mínima varianza en Python:
 
